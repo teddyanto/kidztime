@@ -1,0 +1,1 @@
+// const svg_1 = 'assets/svg/svg-1.svg';
