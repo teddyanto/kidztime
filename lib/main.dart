@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
@@ -15,12 +14,12 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color _primaryColor = WidgetUtil().parseHexColor('#012C3D');
+    Color primaryColor = WidgetUtil().parseHexColor('#012C3D');
 
     return GetMaterialApp(
       theme: ThemeData(
         fontFamily: 'Poppins',
-        primaryColor: _primaryColor,
+        primaryColor: primaryColor,
         primaryColorDark: Colors.black,
       ),
       defaultTransition: Transition.fade,
