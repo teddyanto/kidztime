@@ -1,7 +1,18 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-class DBKidztime {}
+const VERSION = 1;
+
+class DBKidztime {
+  Future<Database> getDatabase() async {
+    final database = openDatabase(
+      join(await getDatabasesPath(), 'kidztime.db'),
+      version: VERSION,
+    );
+
+    return database;
+  }
+}
 
 Future<void> databaseInitialize() async {
   openDatabase(
@@ -63,6 +74,6 @@ Future<void> databaseInitialize() async {
     onOpen: (db) {
       // Actions to perform when the database is opened
     },
-    version: 1,
+    version: VERSION,
   );
 }
