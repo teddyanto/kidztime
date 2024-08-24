@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/routes.dart';
+import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/widget_util.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  databaseInitialize();
+
   runApp(const MainPage());
 }
 

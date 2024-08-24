@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
-import 'package:kidztime/page/lock.dart';
-import 'package:kidztime/page/main_menu.dart';
+import 'package:kidztime/page/lock_screen.dart';
+import 'package:kidztime/page/main_screen.dart';
+import 'package:kidztime/page/setup_screen.dart';
 import 'package:kidztime/splash_screen.dart';
 
 class Routes {
@@ -14,6 +15,11 @@ class Routes {
       GetPage(
         name: '/lock-page',
         page: () => const LockPage(),
+        transition: Transition.fadeIn,
+      ),
+      GetPage(
+        name: '/setup-page',
+        page: () => Setupscreen(),
         transition: Transition.fadeIn,
       ),
       GetPage(
