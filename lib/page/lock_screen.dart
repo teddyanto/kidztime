@@ -72,7 +72,6 @@ class LockPage extends StatelessWidget {
             FourLetterInput(
               controllers: sandiControllers,
               passwordHandleCheck: () {
-                print("Click");
                 passwordHandleCheck(sandiControllers, sandi ?? DEFAULT_KEY);
               },
             ),
