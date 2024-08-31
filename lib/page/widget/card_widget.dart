@@ -8,6 +8,7 @@ class CardWidget extends StatelessWidget {
     required this.horizontalMargin,
     required this.verticalPadding,
     required this.horizontalPadding,
+    this.isFullWidth = true,
   });
 
   final Widget child;
@@ -15,6 +16,7 @@ class CardWidget extends StatelessWidget {
   final double horizontalMargin;
   final double verticalPadding;
   final double horizontalPadding;
+  final bool isFullWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class CardWidget extends StatelessWidget {
         horizontal: horizontalPadding,
         vertical: verticalPadding,
       ),
-      width: MediaQuery.of(context).size.width,
+      width: isFullWidth ? MediaQuery.of(context).size.width : null,
       decoration: BoxDecoration(
         color: Colors.white, // Warna latar belakang kartu
         borderRadius: BorderRadius.circular(16.0), // Sudut melengkung

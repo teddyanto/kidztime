@@ -34,7 +34,9 @@ class _HeaderWidgetState extends State<HeaderWidget> {
                   left: 0,
                   top: 0,
                   child: IconButton(
-                    onPressed: widget.callback(),
+                    onPressed: () {
+                      widget.callback();
+                    },
                     icon: const Icon(
                       Icons.arrow_back_ios,
                       color: Colors.white,

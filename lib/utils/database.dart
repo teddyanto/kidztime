@@ -45,7 +45,8 @@ Future<void> databaseInitialize() async {
               "id INTEGER PRIMARY KEY AUTOINCREMENT, "
               "judul TEXT, "
               "deskripsi TEXT, "
-              "waktu DATETIME)")
+              "waktu INTEGER, "
+              "tanggal TEXT )")
           .then((value) {
         print("Table Aktivitas berhasil dibuat !");
       });

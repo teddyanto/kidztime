@@ -30,28 +30,51 @@ class Setupscreen extends StatefulWidget {
 }
 
 class _SetupscreenState extends State<Setupscreen> {
+  bool hasBackButton = true;
+
+  late Future<Database> dbKidztime;
+
   @override
   void initState() {
     // TODO: implement initState
+    // Menerima argument yang berupa Map
+    if (Get.arguments != null) {
+      final args = Get.arguments as Map<String, dynamic>;
+
+      // Akses data berdasarkan key
+      final fromScreen = args['from'];
+      // setup default hasBackButton = true
+
+      if (fromScreen == 'splash_screen') {
+        // Berarti masuk setup_screen karena baru akses aplikasi
+        // Jadi perlu buat data baru
+        // Tidak ada tombol kembali nya
+        setState(() {
+          hasBackButton = false;
+        });
+      }
+    } else {
+      final Future<Database> dbKidztime = DBKidztime().getDatabase();
+      dbKidztime.then((e) {
+        getPengaturan(e).then((pengaturan) {
+          for (Pengaturan element in pengaturan) {
+            setState(() {
+              widget.namaController.text = element.nama;
+              widget.deskripsiController.text = element.deskripsi;
+
+              widget.sandiControllers[0].text = element.sandi[0];
+              widget.sandiControllers[1].text = element.sandi[1];
+              widget.sandiControllers[2].text = element.sandi[2];
+              widget.sandiControllers[3].text = element.sandi[3];
+            });
+          }
+        });
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Menerima argument yang berupa Map
-    final args = Get.arguments as Map<String, dynamic>;
-
-    // Akses data berdasarkan key
-    final fromScreen = args['from'];
-
-    // setup default hasBackButton = true
-    var hasBackButton = true;
-    if (fromScreen == 'splash_screen') {
-      // Berarti masuk setup_screen karena baru akses aplikasi
-      // Jadi perlu buat data baru
-      // Tidak ada tombol kembali nya
-      hasBackButton = false;
-    }
-
     return Scaffold(
       appBar: WidgetUtil().getAppBar(),
       body: Column(
@@ -59,7 +82,9 @@ class _SetupscreenState extends State<Setupscreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           HeaderWidget(
-            callback: () {},
+            callback: () {
+              Get.back();
+            },
             hasBackButton: hasBackButton,
             titleScreen: "App Setup",
           ),
@@ -113,6 +138,7 @@ class _SetupscreenState extends State<Setupscreen> {
                             height: 10,
                           ),
                           FourLetterInput(
+                              obscureText: false,
                               controllers: widget.sandiControllers,
                               passwordHandleCheck: () {
                                 _saveAppSetup();
@@ -218,13 +244,14 @@ class _SetupscreenState extends State<Setupscreen> {
           );
 
           insertPengaturan(widget.dbKidztime, pengaturan).then((e) {
-            Navigator.of(context)
-                .pop(); // ini buat ngilangin dialog sebelumnya yg konfirmasi
+            // ini buat ngilangin dialog sebelumnya yg konfirmasi
+            Navigator.of(context).pop();
 
             WidgetUtil().showLoadingDialog(
               context: context,
             );
-            Timer(const Duration(seconds: 3), () {
+
+            Timer(const Duration(seconds: 2), () {
               Navigator.of(context)
                   .pop(); // Ini buat ngilangin showDoalog atasnya
 
@@ -236,7 +263,11 @@ class _SetupscreenState extends State<Setupscreen> {
                 okButtonFunction: () {
                   Navigator.of(context)
                       .pop(); // Ini buat ngilangin customeDialog yg sekarang
-                  Get.offAndToNamed('/');
+                  if (!hasBackButton) {
+                    Get.offAndToNamed('/');
+                  } else {
+                    Get.offAndToNamed('/main-menu');
+                  }
                 },
               );
             });

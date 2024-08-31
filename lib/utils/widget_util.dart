@@ -109,4 +109,35 @@ class WidgetUtil {
       },
     );
   }
+
+  String getMonthName(indexMonth) {
+    List<String> bulan = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember'
+    ];
+    return bulan[indexMonth - 1];
+  }
+
+  String getDayName(int indexDay) {
+    List<String> hari = [
+      "Senin",
+      "Selasa",
+      "Rabu",
+      "Kamis",
+      "Jum'at",
+      "Sabtu",
+      "Minggu"
+    ];
+    return hari[indexDay - 1];
+  }
 }
