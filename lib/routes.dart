@@ -3,6 +3,7 @@ import 'package:kidztime/page/lock_screen.dart';
 import 'package:kidztime/page/main_screen.dart';
 import 'package:kidztime/page/setup_screen.dart';
 import 'package:kidztime/splash_screen.dart';
+import 'package:kidztime/times_up_screen.dart';
 
 class Routes {
   List<GetPage<dynamic>> get() {
@@ -10,6 +11,11 @@ class Routes {
       GetPage(
         name: '/',
         page: () => const SplashScreenPage(),
+        transition: Transition.fadeIn,
+      ),
+      GetPage(
+        name: '/times-up',
+        page: () => const TimesUpScreen(),
         transition: Transition.fadeIn,
       ),
       GetPage(
