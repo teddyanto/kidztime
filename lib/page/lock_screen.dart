@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/Pengaturan.dart';
 import 'package:kidztime/page/widget/password_widget.dart';
@@ -30,88 +29,54 @@ class LockPage extends StatelessWidget {
       });
     });
 
-    late bool canDoBack;
-
-    // Menerima argument yang berupa Map
-    if (Get.arguments != null) {
-      final args = Get.arguments as Map<String, dynamic>;
-
-      // Akses data berdasarkan key
-      final fromScreen = args['from'];
-      // setup default hasBackButton = true
-
-      if (fromScreen == 'times_up_screen') {
-        canDoBack = false;
-      }
-    } else {
-      canDoBack = true;
-    }
-
-    return PopScope(
-      canPop: canDoBack,
-      onPopInvoked: (e) async {
-        if (canDoBack) {
-          WidgetUtil().customeDialog(
-            context: context,
-            title: "Keluar aplikasi ?",
-            detail: [],
-            okButtonText: "Ya",
-            okButtonFunction: () {
-              SystemNavigator.pop();
-            },
-            cancelButtonText: "Batal",
-          );
-        }
-      },
-      child: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  color: WidgetUtil().parseHexColor(primaryColor),
-                  borderRadius: BorderRadius.circular(10.0),
-                  border: Border.all(
-                    color: WidgetUtil().parseHexColor(darkColor),
-                    width: 3,
-                  ),
-                ),
-                width: MediaQuery.of(context).size.width * 0.25,
-                child: Hero(
-                  tag: 'apps-icon',
-                  child: Image.asset(
-                    logo,
-                    fit: BoxFit.cover,
-                  ),
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: WidgetUtil().parseHexColor(primaryColor),
+                borderRadius: BorderRadius.circular(10.0),
+                border: Border.all(
+                  color: WidgetUtil().parseHexColor(darkColor),
+                  width: 3,
                 ),
               ),
-              const SizedBox(height: 5),
-              const Text(
-                "KidzTime",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              width: MediaQuery.of(context).size.width * 0.25,
+              child: Hero(
+                tag: 'apps-icon',
+                child: Image.asset(
+                  logo,
+                  fit: BoxFit.cover,
                 ),
               ),
-              const Text(
-                "“Waktu Terkontrol, Kesehatan Terjaga”\nAplikasi Kontrol Gawai untuk Anak yang Lebih Baik.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                ),
+            ),
+            const SizedBox(height: 5),
+            const Text(
+              "KidzTime",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 20),
-              FourLetterInput(
-                controllers: sandiControllers,
-                passwordHandleCheck: () {
-                  passwordHandleCheck(sandiControllers, sandi ?? DEFAULT_KEY);
-                },
+            ),
+            const Text(
+              "“Waktu Terkontrol, Kesehatan Terjaga”\nAplikasi Kontrol Gawai untuk Anak yang Lebih Baik.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
               ),
-              const SizedBox(height: 20),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+            FourLetterInput(
+              controllers: sandiControllers,
+              passwordHandleCheck: () {
+                passwordHandleCheck(sandiControllers, sandi ?? DEFAULT_KEY);
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );

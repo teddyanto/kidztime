@@ -1,9 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screen_lock/flutter_screen_lock.dart';
+import 'package:kidztime/model/pengaturan.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
+import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/png_assets.dart';
+import 'package:sqflite/sqflite.dart';
 
 class TimesUpScreen extends StatefulWidget {
   const TimesUpScreen({super.key});
@@ -20,20 +24,77 @@ class _TimesUpScreenState extends State<TimesUpScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    countTimer = Timer.periodic(const Duration(seconds: 1), (e) {
-      setState(() {
-        countDown -= 1;
-      });
 
-      if (countDown == 0) {
-        countTimer.cancel();
-        Get.offAndToNamed(
-          "/lock-page",
-          arguments: {
-            'from': 'times_up_screen',
-          },
-        );
-      }
+    final Future<Database> dbKidztime = DBKidztime().getDatabase();
+    dbKidztime.then((e) {
+      getPengaturan(e).then((pengaturan) {
+        for (Pengaturan element in pengaturan) {
+          countTimer = Timer.periodic(const Duration(seconds: 1), (e) {
+            setState(() {
+              countDown -= 1;
+            });
+
+            if (countDown == 0) {
+              countTimer.cancel();
+              screenLock(
+                context: context,
+                correctString: element.sandi,
+                canCancel: false,
+                title: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(
+                          10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Warna latar belakang kartu
+                          borderRadius:
+                              BorderRadius.circular(16.0), // Sudut melengkung
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black
+                                  .withOpacity(0.2), // Warna bayangan
+                              spreadRadius: 2, // Radius penyebaran bayangan
+                              blurRadius: 10, // Radius blur bayangan
+                              offset: const Offset(5, 5), // Posisi bayangan
+                            ),
+                          ],
+                        ),
+                        width: 60,
+                        child: Image.asset(
+                          logo,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Text(
+                        "Silahkan masukkan sandi yang benar untuk membuka perangkat anda.",
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                onUnlocked: () {
+                  SystemNavigator.pop();
+                },
+              );
+              // Get.offAndToNamed(
+              //   "/lock-page",
+              //   arguments: {
+              //     'from': 'times_up_screen',
+              //   },
+              // );
+            }
+          });
+        }
+      });
     });
   }
 
