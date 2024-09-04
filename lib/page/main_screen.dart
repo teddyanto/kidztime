@@ -3,7 +3,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
+import 'package:kidztime/background_service.dart';
 import 'package:kidztime/model/aktivitas.dart';
 import 'package:kidztime/model/pengaturan.dart';
 import 'package:kidztime/page/setup_screen.dart';
@@ -280,7 +282,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                     ),
                     // Dummy, deleted on production
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         WidgetUtil().showToast(
                           msg: "Berhasil menambah data aktivitas",
                         );
@@ -313,6 +315,34 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         ),
                       ),
                     ),
+                    TextButton(
+                      onPressed: () {
+                        FlutterBackgroundService().invoke("setAsBackground");
+                      },
+                      child: const Text(
+                        "Set AsBackground",
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        FlutterBackgroundService().invoke("setAsForeground");
+                      },
+                      child: const Text(
+                        "Set AsForeground",
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        final service = FlutterBackgroundService();
+                        var isRunning = await service.isRunning();
+                        isRunning
+                            ? FlutterBackgroundService().invoke("stopService")
+                            : BackgroundService().start();
+                      },
+                      child: const Text(
+                        "Start / Stop",
+                      ),
+                    )
                   ],
                 ),
               ),

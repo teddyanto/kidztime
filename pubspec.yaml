@@ -42,6 +42,9 @@ dependencies:
   path: ^1.9.0
   fluttertoast: ^8.2.8
   flutter_screen_lock: ^9.1.0
+  flutter_background_service: ^5.0.10
+  path_provider: ^2.1.4
+  shared_preferences: ^2.3.2
 
 dev_dependencies:
   flutter_test:
@@ -85,7 +88,7 @@ flutter:
     - family: Poppins
       fonts:
         - asset: assets/fonts/poppins/Poppins-ExtraLight.ttf
-          weight: 300
+          weight: 200
         - asset: assets/fonts/poppins/Poppins-Light.ttf
           weight: 300
         - asset: assets/fonts/poppins/Poppins-Regular.ttf
@@ -97,7 +100,7 @@ flutter:
         - asset: assets/fonts/poppins/Poppins-Bold.ttf
           weight: 700
         - asset: assets/fonts/poppins/Poppins-ExtraLightItalic.ttf
-          weight: 300
+          weight: 200
           style: italic
         - asset: assets/fonts/poppins/Poppins-LightItalic.ttf
           weight: 300
