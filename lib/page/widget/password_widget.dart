@@ -54,6 +54,7 @@ class _FourLetterInputState extends State<FourLetterInput> {
                 keyboardType: TextInputType.number,
                 maxLength: 1,
                 textAlign: TextAlign.center,
+                autofocus: true,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 25,

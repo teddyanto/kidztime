@@ -1,4 +1,4 @@
-package com.example.kidztime
+package com.binus.kidztime
 
 import io.flutter.embedding.android.FlutterActivity
 

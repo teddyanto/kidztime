@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_screen_lock/flutter_screen_lock.dart';
 import 'package:kidztime/model/pengaturan.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
@@ -81,16 +82,11 @@ class _TimesUpScreenState extends State<TimesUpScreen> {
                     ],
                   ),
                 ),
-                onUnlocked: () {
+                onUnlocked: () async {
+                  FlutterBackgroundService().invoke("stopService");
                   SystemNavigator.pop();
                 },
               );
-              // Get.offAndToNamed(
-              //   "/lock-page",
-              //   arguments: {
-              //     'from': 'times_up_screen',
-              //   },
-              // );
             }
           });
         }
