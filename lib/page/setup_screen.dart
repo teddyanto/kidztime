@@ -251,7 +251,7 @@ class _SetupscreenState extends State<Setupscreen> {
               context: context,
             );
 
-            Timer(const Duration(seconds: 2), () {
+            Timer(const Duration(seconds: 1), () {
               Navigator.of(context)
                   .pop(); // Ini buat ngilangin showDoalog atasnya
 

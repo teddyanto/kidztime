@@ -10,6 +10,7 @@ class Routes {
     return [
       GetPage(
         name: '/',
+        // page: () => const TestScreen(),
         page: () => const SplashScreenPage(),
         transition: Transition.fadeIn,
       ),

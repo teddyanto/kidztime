@@ -45,6 +45,8 @@ dependencies:
   flutter_background_service: ^5.0.10
   path_provider: ^2.1.4
   shared_preferences: ^2.3.2
+  package_info_plus: ^8.0.2
+  external_app_launcher: ^4.0.0
 
 dev_dependencies:
   flutter_test:
