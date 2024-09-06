@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kidztime/main.dart';
 import 'package:kidztime/model/batasPenggunaan.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
 import 'package:kidztime/page/widget/header_widget.dart';
@@ -14,7 +13,7 @@ import 'package:kidztime/utils/widget_util.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TimeLimitScreen extends StatefulWidget {
-  TimeLimitScreen({Key? key}) : super(key: key);
+  TimeLimitScreen({super.key});
 
   //controllers
   late TextEditingController namaController = TextEditingController();
@@ -50,7 +49,9 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
           children: [
             HeaderWidget(
               titleScreen: "Time Limit",
-              callback: () {},
+              callback: () {
+                Get.back();
+              },
               hasBackButton: hasbackbutton,
             ),
             Expanded(
@@ -101,7 +102,7 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
                           ),
                           RadioButtonWidget<bool>(
                             title: "Status Aktif",
-                            options: [true, false],
+                            options: const [true, false],
                             optionLabels: const {
                               true: 'Aktif',
                               false: 'Tidak Aktif',

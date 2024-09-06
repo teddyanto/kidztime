@@ -32,7 +32,6 @@ class TextInputWidget extends StatelessWidget {
           height: 5,
         ),
         TextField(
-          autofocus: true,
           maxLines: maxLines,
           controller: controller,
           decoration: InputDecoration(

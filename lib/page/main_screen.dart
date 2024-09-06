@@ -7,7 +7,6 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/aktivitas.dart';
 import 'package:kidztime/model/pengaturan.dart';
-import 'package:kidztime/page/setup_screen.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
 import 'package:kidztime/utils/background_service.dart';
 import 'package:kidztime/utils/colors.dart';
@@ -123,7 +122,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             icon: iconMenu1,
                             title: "Atur Batas Waktu",
                             callBack: () {
-                              print("Clicked");
+                              Get.toNamed("/time-limit");
                             },
                           ),
                           MenuWidget(
@@ -147,10 +146,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             icon: iconMenu4,
                             title: "Pengaturan Aplikasi",
                             callBack: () {
-                              Get.to(
-                                () => Setupscreen(),
-                                transition: Transition.rightToLeft,
-                              );
+                              Get.toNamed("/setup-page");
                             },
                           ),
                         ],
