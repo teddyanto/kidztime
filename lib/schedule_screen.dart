@@ -44,7 +44,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           HeaderWidget(
-            titleScreen: "Time Limit",
+            titleScreen: "Set Schedule",
             callback: () {
               Get.back();
             },
