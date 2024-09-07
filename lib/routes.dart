@@ -3,6 +3,7 @@ import 'package:kidztime/page/lock_screen.dart';
 import 'package:kidztime/page/main_screen.dart';
 import 'package:kidztime/page/setup_screen.dart';
 import 'package:kidztime/page/time_limit_screen.dart';
+import 'package:kidztime/schedule_screen.dart';
 import 'package:kidztime/splash_screen.dart';
 import 'package:kidztime/times_up_screen.dart';
 
@@ -39,6 +40,11 @@ class Routes {
         name: '/time-limit',
         page: () => TimeLimitScreen(),
         transition: Transition.rightToLeft,
+      ),
+      GetPage(
+        name: '/schedule-page',
+        page: () => ScheduleScreen(),
+        transition: Transition.fadeIn,
       ),
     ];
   }

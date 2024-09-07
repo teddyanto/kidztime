@@ -130,7 +130,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             icon: iconMenu2,
                             title: "Atur Jadwal Penggunaan",
                             callBack: () {
-                              print("Clicked");
+                              Get.toNamed('/schedule-page');
                             },
                           ),
                           MenuWidget(
