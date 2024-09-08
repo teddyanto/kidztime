@@ -44,7 +44,7 @@ class Routes {
       GetPage(
         name: '/schedule-page',
         page: () => ScheduleScreen(),
-        transition: Transition.fadeIn,
+        transition: Transition.rightToLeft,
       ),
     ];
   }

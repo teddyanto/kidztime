@@ -37,6 +37,7 @@ void onStart(ServiceInstance service) async {
 
         if (now.isAfter(lockTime)) {
           print("UDAH LEWAT CUYYY WAKTU NYA");
+          timer.cancel();
           await LaunchApp.openApp(
             androidPackageName: 'com.binus.kidztime',
           );

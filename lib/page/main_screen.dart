@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,12 +24,18 @@ class MainMenuPage extends StatefulWidget {
 
 class _MainMenuPageState extends State<MainMenuPage> {
   final Future<Database> dbKidztime = DBKidztime().getDatabase();
-  String nama = "user_name";
   late List<Aktivitas> daftarAktivitas = [];
+  late bool batasWaktuIsRunning = false;
+  late Timer _tick;
+  late DateTime _dateTimeLeft = DateTime(0, 0, 0, 0, 0, 0);
+
+  String nama = "user_name";
   String temp = "";
+
   @override
   void initState() {
     super.initState();
+
     // Try to stop whatever already running
     FlutterBackgroundService().invoke("stopService");
 
@@ -151,7 +156,51 @@ class _MainMenuPageState extends State<MainMenuPage> {
                           ),
                         ],
                       ),
+                      batasWaktuIsRunning
+                          ? IconButton(
+                              onPressed: () async {
+                                buttonStartStopHandle(
+                                  context: context,
+                                );
+                              },
+                              icon: const Row(
+                                children: [
+                                  Text("Hentikan batas waktu"),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Icon(
+                                    Icons.stop_circle,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : IconButton(
+                              onPressed: () async {
+                                buttonStartStopHandle(
+                                  context: context,
+                                  seconds: 20,
+                                );
+                              },
+                              icon: const Row(
+                                children: [
+                                  Text("Mulai batas waktu"),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Icon(
+                                    Icons.play_circle,
+                                  ),
+                                ],
+                              ),
+                            ),
+                      BatasWaktuBarWidget(
+                        width: width,
+                        aktif: batasWaktuIsRunning,
+                        timeLeft: _dateTimeLeft,
+                      ),
                       // Dummy, deleted on production
+                      /*
                       TextButton(
                         onPressed: () async {
                           WidgetUtil().showToast(
@@ -219,38 +268,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                           "Set AsForeground",
                         ),
                       ),
-                      TextButton(
-                        onPressed: () async {
-                          final service = FlutterBackgroundService();
-                          var isRunning = await service.isRunning();
-                          if (isRunning) {
-                            FlutterBackgroundService().invoke("stopService");
-                          } else {
-                            /**
-                             * Ini logic buat jalanin background service
-                             * Jadi diisi dulu nilai sharedpreference nya pake
-                             * "await Preferences.setLockTime"
-                             * isinya jam, menit, detik berapa lama akan dimainkan
-                             * 
-                             * Terus nilai balikkannya jalanin background service
-                             * 
-                             * Trial 20 Detik 
-                             */
-                            //
-                            await Preferences.setLockTime(
-                                    hours: 0, minutes: 0, seconds: 20)
-                                .then(
-                              (e) {
-                                BackgroundService.instance.init();
-                                BackgroundService().start();
-                              },
-                            );
-                          }
-                        },
-                        child: const Text(
-                          "Start / Stop",
-                        ),
-                      ),
+                      */
                     ],
                   ),
                 ),
@@ -259,6 +277,196 @@ class _MainMenuPageState extends State<MainMenuPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> buttonStartStopHandle({
+    required BuildContext context,
+    int hours = 0,
+    int minutes = 0,
+    int seconds = 0,
+  }) async {
+    // Karena kalo kosong semua anggap saja mematikan, bukan menjalankan
+    if (hours == 0 && minutes == 0 && seconds == 0) {
+      const snackBar = SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          'Service berhasil dibatalkan !',
+        ),
+      );
+
+      stopService();
+      // Find the ScaffoldMessenger in the widget tree
+      // and use it to show a SnackBar.
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
+      /**
+       * Ini logic buat jalanin background service
+       * Jadi diisi dulu nilai sharedpreference nya pake
+       * "await Preferences.setLockTime"
+       * isinya jam, menit, detik berapa lama akan dimainkan
+       * 
+       * Terus nilai balikkannya jalanin background service
+       * 
+       * Trial 20 Detik 
+       */
+      //
+      await Preferences.setLockTime(
+              hours: hours, minutes: minutes, seconds: seconds)
+          .then(
+        (e) {
+          BackgroundService.instance.init();
+          BackgroundService().start();
+
+          setState(() {
+            batasWaktuIsRunning = true;
+            DateTime currentTime = DateTime(0, 0, 0, hours, minutes, seconds);
+            _dateTimeLeft = currentTime;
+          });
+
+          _tick = Timer.periodic(const Duration(seconds: 1), (timer) {
+            print("_dateTimeLeft $_dateTimeLeft");
+            print("DateTime(0) ${DateTime(0, 0, 0)}");
+
+            setState(() {
+              if (_dateTimeLeft == DateTime(0, 0, 0)) {
+                stopService();
+
+                const snackBar = SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  content: Text(
+                    'Service telah selesai !',
+                  ),
+                );
+
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              } else {
+                _dateTimeLeft =
+                    _dateTimeLeft.subtract(const Duration(seconds: 1));
+              }
+            });
+          });
+
+          final snackBar = SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: const Text(
+              'Service berhasil dijalankan !',
+            ),
+            action: SnackBarAction(
+              label: "batal",
+              onPressed: () {
+                buttonStartStopHandle(context: context);
+              },
+            ),
+          );
+
+          // Find the ScaffoldMessenger in the widget tree
+          // and use it to show a SnackBar.
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        },
+      );
+    }
+  }
+
+  void stopService() {
+    FlutterBackgroundService().invoke("stopService");
+
+    setState(() {
+      batasWaktuIsRunning = false;
+      _tick.cancel();
+      DateTime currentTime = DateTime(0);
+      _dateTimeLeft = currentTime;
+    });
+  }
+}
+
+class BatasWaktuBarWidget extends StatelessWidget {
+  const BatasWaktuBarWidget({
+    super.key,
+    required this.width,
+    required this.aktif,
+    required this.timeLeft,
+  });
+
+  final double width;
+  final bool aktif;
+
+  final DateTime timeLeft;
+
+  @override
+  Widget build(BuildContext context) {
+    int hours = timeLeft.hour;
+    int minutes = timeLeft.minute;
+    int seconds = timeLeft.second;
+
+    String timeFormatted = [
+      hours.toString().padLeft(2, "0"),
+      minutes.toString().padLeft(2, "0"),
+      seconds.toString().padLeft(2, "0"),
+    ].join(":");
+
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          width: width,
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: aktif ? Colors.red : Colors.grey,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(
+                5,
+              ),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  "Batas waktu sedang berjalan ",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () => {
+                  WidgetUtil().customeDialog(
+                    context: context,
+                    title: "Informasi",
+                    detail: [],
+                    okButtonText: "Ok",
+                    okButtonFunction: () {
+                      Navigator.of(context).pop();
+                    },
+                  )
+                },
+                splashColor: WidgetUtil().parseHexColor(darkColor),
+                child: const Icon(
+                  Icons.open_in_new_rounded,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: FittedBox(
+            child: Text(
+              timeFormatted,
+              style: const TextStyle(
+                fontSize: 400,
+              ),
+            ),
+          ),
+        )
+      ],
     );
   }
 }
