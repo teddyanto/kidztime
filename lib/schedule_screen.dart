@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/jadwalPenggunaan.dart';
@@ -86,6 +87,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           TimeInputWidget(
                             title: "Waktu Mulai",
                             controller: widget.waktuMulaiController,
+                            hint: "Tekan di sini",
+                            initialTime: widget.waktuMulaiController.text == ""
+                                ? TimeOfDay.now()
+                                : TimeOfDay(
+                                    hour: int.parse(widget
+                                        .waktuMulaiController.text
+                                        .split(":")[0]),
+                                    minute: int.parse(widget
+                                        .waktuMulaiController.text
+                                        .split(":")[1])),
                           ),
                           const SizedBox(
                             height: 10.0,
@@ -93,6 +104,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           TimeInputWidget(
                             title: "Waktu Akhir",
                             controller: widget.waktuAkhirController,
+                            hint: "Tekan di sini",
+                            initialTime: widget.waktuAkhirController.text == ""
+                                ? TimeOfDay.now()
+                                : TimeOfDay(
+                                    hour: int.parse(widget
+                                        .waktuAkhirController.text
+                                        .split(":")[0]),
+                                    minute: int.parse(widget
+                                        .waktuAkhirController.text
+                                        .split(":")[1])),
                           ),
                           const SizedBox(
                             height: 10.0,

@@ -36,39 +36,39 @@ class _SetupscreenState extends State<Setupscreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    // Menerima argument yang berupa Map
+    super.initState();
     if (Get.arguments != null) {
       final args = Get.arguments as Map<String, dynamic>;
-
-      // Akses data berdasarkan key
       final fromScreen = args['from'];
-      // setup default hasBackButton = true
-
       if (fromScreen == 'splash_screen') {
-        // Berarti masuk setup_screen karena baru akses aplikasi
-        // Jadi perlu buat data baru
-        // Tidak ada tombol kembali nya
         setState(() {
           hasBackButton = false;
         });
       }
     } else {
-      final Future<Database> dbKidztime = DBKidztime().getDatabase();
-      dbKidztime.then((e) {
-        getPengaturan(e).then((pengaturan) {
-          for (Pengaturan element in pengaturan) {
-            setState(() {
-              widget.namaController.text = element.nama;
-              widget.deskripsiController.text = element.deskripsi;
+      _loadPengaturan();
+    }
+  }
 
-              widget.sandiControllers[0].text = element.sandi[0];
-              widget.sandiControllers[1].text = element.sandi[1];
-              widget.sandiControllers[2].text = element.sandi[2];
-              widget.sandiControllers[3].text = element.sandi[3];
-            });
-          }
-        });
+  @override
+  void dispose() {
+    widget.namaController.dispose();
+    widget.deskripsiController.dispose();
+
+    super.dispose();
+  }
+
+  Future<void> _loadPengaturan() async {
+    final db = await DBKidztime().getDatabase();
+    final pengaturan = await getPengaturan(db);
+    if (pengaturan.isNotEmpty) {
+      setState(() {
+        final p = pengaturan.first;
+        widget.namaController.text = p.nama;
+        widget.deskripsiController.text = p.deskripsi;
+        for (int i = 0; i < 4; i++) {
+          widget.sandiControllers[i].text = p.sandi[i];
+        }
       });
     }
   }

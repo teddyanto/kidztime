@@ -7,6 +7,7 @@ import 'package:kidztime/page/widget/card_widget.dart';
 import 'package:kidztime/page/widget/header_widget.dart';
 import 'package:kidztime/page/widget/radio_input_widget.dart';
 import 'package:kidztime/page/widget/text_input_widget.dart';
+import 'package:kidztime/page/widget/time_input_widget.dart';
 import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/widget_util.dart';
@@ -69,33 +70,55 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextInputWidget(
+                            maxLength: 20,
                             controller: widget.namaController,
-                            title: "Nama",
-                            placeholder: "Masukkan nama",
+                            title: "Nama Batasan",
+                            placeholder: "Masukkan nama batasan",
                           ),
                           const SizedBox(
                             height: 10.0,
                           ),
                           TextInputWidget(
+                            maxLength: 150,
                             controller: widget.deskripsiController,
                             title: "Deskripsi",
                             placeholder: "Masukkan deskripsi",
+                            maxLines: 3,
+                            textInputAction: TextInputAction.done,
                           ),
                           const SizedBox(
                             height: 10.0,
                           ),
-                          TextInputWidget(
+                          TimeInputWidget(
                             controller: widget.bataswaktuController,
                             title: "Batas Waktu",
-                            placeholder: "Masukkan batas waktu",
+                            hint: "Tekan di sini",
+                            initialTime: widget.bataswaktuController.text == ''
+                                ? const TimeOfDay(hour: 0, minute: 0)
+                                : TimeOfDay(
+                                    hour: int.parse(widget
+                                        .bataswaktuController.text
+                                        .split(":")[0]),
+                                    minute: int.parse(widget
+                                        .bataswaktuController.text
+                                        .split(":")[1])),
                           ),
                           const SizedBox(
                             height: 10.0,
                           ),
-                          TextInputWidget(
+                          TimeInputWidget(
                             controller: widget.toleransiController,
                             title: "Toleransi",
-                            placeholder: "Masukkan toleransi",
+                            hint: "Tekan di sini",
+                            initialTime: widget.toleransiController.text == ""
+                                ? const TimeOfDay(hour: 0, minute: 5)
+                                : TimeOfDay(
+                                    hour: int.parse(widget
+                                        .toleransiController.text
+                                        .split(":")[0]),
+                                    minute: int.parse(widget
+                                        .toleransiController.text
+                                        .split(":")[1])),
                           ),
                           const SizedBox(
                             height: 10.0,
@@ -116,26 +139,29 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
                           ),
                           Align(
                               alignment: Alignment.centerRight,
-                              child: InkWell(
-                                onTap: () {
-                                  _saveTimeLimit();
-                                },
-                                borderRadius: BorderRadius.circular(10.0),
-                                splashColor: Colors.amber,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 40.0, vertical: 5.0),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        WidgetUtil().parseHexColor(darkColor),
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  child: const Text(
-                                    "Simpan",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    _saveTimeLimit();
+                                  },
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  splashColor: Colors.amber,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 40.0, vertical: 5.0),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          WidgetUtil().parseHexColor(darkColor),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    child: const Text(
+                                      "Simpan",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -215,6 +241,10 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
             statusAktif: _selectedStatus, // Save as boolean
           );
 
+          if (bataspenggunaan.statusAktif) {
+            updateStatusAktifBatasPenggunaan(widget.dbKidztime, false);
+          }
+
           insertOrUpdateBatasPenggunaan(widget.dbKidztime, bataspenggunaan)
               .then((e) {
             // Print the data that was just inserted
@@ -235,7 +265,8 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
                 okButtonText: "OK",
                 okButtonFunction: () {
                   Navigator.of(context).pop();
-                  Get.offAndToNamed('/main-menu');
+
+                  Get.back(result: "added");
                 },
               );
             });

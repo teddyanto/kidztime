@@ -51,8 +51,8 @@ Future<void> insertOrUpdateBatasPenggunaan(
   // Check if a record with the same name exists.
   final List<Map<String, dynamic>> existingRecords = await db.query(
     tableName,
-    where: 'nama = ?',
-    whereArgs: [bataspenggunaan.nama],
+    where: 'id = ?',
+    whereArgs: [bataspenggunaan.id],
   );
 
   if (existingRecords.isNotEmpty) {
@@ -60,8 +60,8 @@ Future<void> insertOrUpdateBatasPenggunaan(
     await db.update(
       tableName,
       bataspenggunaan.toMap(),
-      where: 'nama = ?',
-      whereArgs: [bataspenggunaan.nama],
+      where: 'id = ?',
+      whereArgs: [bataspenggunaan.id],
     ).then((e) {
       print("Data updated in the database: ${bataspenggunaan.toString()}");
     });
@@ -97,4 +97,41 @@ Future<List<Bataspenggunaan>> getBatasPenggunaan(Database database) async {
         statusAktif: (map['status_aktif'] as int) == 1,
       )
   ];
+}
+
+// Function to delete batas penggunaan by id
+Future<void> deleteBatasPenggunaanById(
+    Future<Database> database, int id) async {
+  // Get a reference to the database.
+  final db = await database;
+
+  // Delete the record from the database.
+  await db.delete(
+    tableName,
+    where: 'id = ?',
+    whereArgs: [id],
+  ).then((_) {
+    print("Data with id $id has been deleted from the database.");
+  });
+}
+
+Future<void> updateStatusAktifBatasPenggunaan(
+  Future<Database> database,
+  bool statusAktif,
+) async {
+  // Get a reference to the database.
+  final db = await database;
+
+  // Convert the boolean value to integer (0 or 1).
+  int statusAktifValue = statusAktif ? 1 : 0;
+
+  // Update all records in the table to have the new statusAktif value.
+  int count = await db.update(
+    tableName,
+    {
+      'status_aktif': statusAktifValue,
+    },
+  );
+
+  print("Updated $count records in the database to statusAktif: $statusAktif.");
 }

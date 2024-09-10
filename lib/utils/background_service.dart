@@ -34,7 +34,6 @@ void onStart(ServiceInstance service) async {
 
         print('FLUTTER BACKGROUND SERVICE: $now');
         print('FLUTTER BACKGROUND SERVICE time: $lockTime');
-
         if (now.isAfter(lockTime)) {
           print("UDAH LEWAT CUYYY WAKTU NYA");
           timer.cancel();

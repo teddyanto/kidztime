@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/aktivitas.dart';
+import 'package:kidztime/model/batasPenggunaan.dart';
 import 'package:kidztime/model/pengaturan.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
 import 'package:kidztime/utils/background_service.dart';
@@ -28,6 +29,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
   late bool batasWaktuIsRunning = false;
   late Timer _tick;
   late DateTime _dateTimeLeft = DateTime(0, 0, 0, 0, 0, 0);
+  late Bataspenggunaan? _bataspenggunaan;
 
   String nama = "user_name";
   String temp = "";
@@ -36,30 +38,76 @@ class _MainMenuPageState extends State<MainMenuPage> {
   void initState() {
     super.initState();
 
+    _bataspenggunaan = null;
+
     // Try to stop whatever already running
-    FlutterBackgroundService().invoke("stopService");
+    // FlutterBackgroundService().invoke("stopService");
 
     // TESTING AJA, BISA DIPAKE BUAT MUNCULIN APA GITU
-    Preferences.getTemp().then((e) {
-      setState(() {});
-    });
+    Preferences.getTemp().then((e) {});
 
-    // TODO: implement initState
     dbKidztime.then((e) {
       getPengaturan(e).then((pengaturan) {
         for (Pengaturan element in pengaturan) {
-          setState(() {
-            nama = element.nama;
-          });
+          nama = element.nama;
         }
       });
 
       getAktivitas(e).then((aktivitas) {
-        setState(() {
-          daftarAktivitas = aktivitas;
+        daftarAktivitas = aktivitas;
+      });
+
+      getBatasPenggunaan(e).then((batasPenggunaan) {
+        for (var i = 0; i < batasPenggunaan.length; i++) {
+          var item = batasPenggunaan[i];
+          if (item.statusAktif) {
+            _bataspenggunaan = item;
+          }
+        }
+      }).then((e) {
+        final service = FlutterBackgroundService();
+        service.isRunning().then((isRunning) {
+          if (isRunning) {
+            Preferences.getLockTime().then((lockTime) {
+              Duration remainingDuration = lockTime.difference(DateTime.now());
+              // Get total hours, minutes, and seconds
+              int totalHours = remainingDuration.inHours;
+              int totalMinutes = remainingDuration.inMinutes;
+              int totalSeconds = remainingDuration.inSeconds;
+
+              // Extract hours, minutes, and seconds
+              int hours = totalHours;
+              int minutes = totalMinutes %
+                  60; // Remaining minutes after converting to hours
+              int seconds = totalSeconds %
+                  60; // Remaining seconds after converting to minutes
+
+              print("Masuk ke getLockTime $remainingDuration");
+              _dateTimeLeft = DateTime(0, 0, 0, hours, minutes, seconds);
+              startTick(context);
+            });
+          } else {
+            refreshBatasPenggunaan();
+          }
         });
       });
+
+      setState(() {});
     });
+  }
+
+  void refreshBatasPenggunaan() {
+    if (_bataspenggunaan != null) {
+      String batasWaktu = _bataspenggunaan!.batasWaktu;
+
+      int hours = int.parse(batasWaktu.split(":")[0]);
+      int minutes = int.parse(batasWaktu.split(":")[1]);
+      _dateTimeLeft = DateTime(0, 0, 0, hours, minutes);
+    } else {
+      _dateTimeLeft = DateTime(0);
+    }
+
+    setState(() {});
   }
 
   @override
@@ -126,8 +174,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             width: MediaQuery.of(context).size.width,
                             icon: iconMenu1,
                             title: "Atur Batas Waktu",
-                            callBack: () {
-                              Get.toNamed("/time-limit");
+                            callBack: () async {
+                              final result =
+                                  await Get.toNamed("/list-time-limit");
+                              _bataspenggunaan = result;
+                              refreshBatasPenggunaan();
                             },
                           ),
                           MenuWidget(
@@ -177,18 +228,62 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             )
                           : IconButton(
                               onPressed: () async {
-                                buttonStartStopHandle(
-                                  context: context,
-                                  seconds: 20,
-                                );
+                                if (_bataspenggunaan != null) {
+                                  String batasWaktu =
+                                      _bataspenggunaan!.batasWaktu;
+
+                                  int hours =
+                                      int.parse(batasWaktu.split(":")[0]);
+                                  int minutes =
+                                      int.parse(batasWaktu.split(":")[1]);
+
+                                  _dateTimeLeft =
+                                      DateTime(0, 0, 0, hours, minutes);
+
+                                  buttonStartStopHandle(
+                                    context: context,
+                                    hours: hours,
+                                    minutes: minutes,
+                                    seconds: 0,
+                                  );
+                                } else {
+                                  var snackBar = const SnackBar(
+                                    behavior: SnackBarBehavior.floating,
+                                    content: Text(
+                                      'Mohon atur batas waktu terlebih dahulu !',
+                                    ),
+                                    duration: Duration(seconds: 3),
+                                  );
+
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar);
+
+                                  snackBar = const SnackBar(
+                                    behavior: SnackBarBehavior.floating,
+                                    content: Text(
+                                      'Silahkan masuk ke menu `Atur Batas Waktu`',
+                                    ),
+                                    duration: Duration(seconds: 4),
+                                  );
+
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar);
+                                }
                               },
-                              icon: const Row(
+                              icon: Row(
                                 children: [
-                                  Text("Mulai batas waktu"),
-                                  SizedBox(
+                                  Text(
+                                    "Mulai batas waktu",
+                                    style: TextStyle(
+                                      color: _bataspenggunaan == null
+                                          ? Colors.grey
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                  const SizedBox(
                                     width: 5,
                                   ),
-                                  Icon(
+                                  const Icon(
                                     Icons.play_circle,
                                   ),
                                 ],
@@ -293,6 +388,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         content: Text(
           'Service berhasil dibatalkan !',
         ),
+        duration: Duration(seconds: 2),
       );
 
       stopService();
@@ -318,40 +414,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
           BackgroundService.instance.init();
           BackgroundService().start();
 
-          setState(() {
-            batasWaktuIsRunning = true;
-            DateTime currentTime = DateTime(0, 0, 0, hours, minutes, seconds);
-            _dateTimeLeft = currentTime;
-          });
-
-          _tick = Timer.periodic(const Duration(seconds: 1), (timer) {
-            print("_dateTimeLeft $_dateTimeLeft");
-            print("DateTime(0) ${DateTime(0, 0, 0)}");
-
-            setState(() {
-              if (_dateTimeLeft == DateTime(0, 0, 0)) {
-                stopService();
-
-                const snackBar = SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  content: Text(
-                    'Service telah selesai !',
-                  ),
-                );
-
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              } else {
-                _dateTimeLeft =
-                    _dateTimeLeft.subtract(const Duration(seconds: 1));
-              }
-            });
-          });
+          startTick(context);
 
           final snackBar = SnackBar(
             behavior: SnackBarBehavior.floating,
             content: const Text(
               'Service berhasil dijalankan !',
             ),
+            duration: const Duration(seconds: 2),
             action: SnackBarAction(
               label: "batal",
               onPressed: () {
@@ -368,15 +438,44 @@ class _MainMenuPageState extends State<MainMenuPage> {
     }
   }
 
+  void startTick(BuildContext context) {
+    batasWaktuIsRunning = true;
+
+    _tick = Timer.periodic(const Duration(seconds: 1), (timer) {
+      print("_dateTimeLeft $_dateTimeLeft");
+      print("DateTime(0) ${DateTime(0, 0, 0)}");
+
+      if (_dateTimeLeft == DateTime(0, 0, 0)) {
+        stopService();
+
+        const snackBar = SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            'Service telah selesai !',
+          ),
+          duration: Duration(seconds: 2),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      } else {
+        _dateTimeLeft = _dateTimeLeft.subtract(const Duration(seconds: 1));
+      }
+
+      setState(() {});
+    });
+  }
+
   void stopService() {
     FlutterBackgroundService().invoke("stopService");
+    batasWaktuIsRunning = false;
+    _tick.cancel();
+    DateTime currentTime = DateTime(0);
+    _dateTimeLeft = currentTime;
+    updateStatusAktifBatasPenggunaan(dbKidztime, false);
+    _bataspenggunaan = null;
+    Preferences.setLockTime(hours: 0, minutes: 0, seconds: 0);
 
-    setState(() {
-      batasWaktuIsRunning = false;
-      _tick.cancel();
-      DateTime currentTime = DateTime(0);
-      _dateTimeLeft = currentTime;
-    });
+    setState(() {});
   }
 }
 

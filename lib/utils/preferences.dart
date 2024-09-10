@@ -5,12 +5,15 @@ class Preferences {
     SharedPreferences pref = await SharedPreferences.getInstance();
 
     pref.setString("temp", text);
+    print("setTemp called: $text");
   }
 
   static Future<String> getTemp() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
 
-    return pref.getString("temp") ?? "";
+    String temp = pref.getString("temp") ?? "";
+    print("getTemp called: $temp");
+    return temp;
   }
 
   static Future<void> setLockTime({
@@ -25,19 +28,20 @@ class Preferences {
         .toIso8601String();
 
     pref.setString("locktime", lockTime);
+    print("setLockTime called: $lockTime");
   }
 
   static Future<DateTime> getLockTime() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
 
     String? lockTimeString = pref.getString("locktime");
-
     if (lockTimeString == null) {
-      // If no lock time is set, return null
+      print("getLockTime called: No lock time set");
       return DateTime.now();
     }
 
     DateTime lockTime = DateTime.parse(lockTimeString);
+    print("getLockTime called: $lockTimeString");
     return lockTime;
   }
 }
