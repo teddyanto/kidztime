@@ -9,26 +9,35 @@ import 'package:kidztime/utils/png_assets.dart';
 import 'package:kidztime/utils/widget_util.dart';
 import 'package:sqflite/sqflite.dart';
 
-class LockPage extends StatelessWidget {
+class LockPage extends StatefulWidget {
   const LockPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<TextEditingController> sandiControllers = List.generate(
-      4,
-      (_) => TextEditingController(),
-    );
+  _LockPageState createState() => _LockPageState();
+}
 
-    final Future<Database> dbKidztime = DBKidztime().getDatabase();
-    late String? sandi;
-    dbKidztime.then((e) {
-      getPengaturan(e).then((pengaturan) {
-        for (Pengaturan element in pengaturan) {
-          sandi = element.sandi;
-        }
+class _LockPageState extends State<LockPage> {
+  late List<TextEditingController> sandiControllers;
+  late Future<Database> dbKidztime;
+  String? sandi;
+
+  @override
+  void initState() {
+    super.initState();
+    sandiControllers = List.generate(4, (_) => TextEditingController());
+    dbKidztime = DBKidztime().getDatabase();
+
+    dbKidztime.then((db) {
+      getPengaturan(db).then((pengaturan) {
+        setState(() {
+          sandi = pengaturan.isNotEmpty ? pengaturan.first.sandi : DEFAULT_KEY;
+        });
       });
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class CardWidget extends StatelessWidget {
-  const CardWidget({
-    super.key,
-    required this.child,
-    required this.verticalMargin,
-    required this.horizontalMargin,
-    required this.verticalPadding,
-    required this.horizontalPadding,
-    this.isFullWidth = true,
-  });
+  const CardWidget(
+      {super.key,
+      required this.child,
+      required this.verticalMargin,
+      required this.horizontalMargin,
+      required this.verticalPadding,
+      required this.horizontalPadding,
+      this.isFullWidth = true,
+      this.border});
 
   final Widget child;
   final double verticalMargin;
@@ -17,6 +17,7 @@ class CardWidget extends StatelessWidget {
   final double verticalPadding;
   final double horizontalPadding;
   final bool isFullWidth;
+  final Border? border;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +34,7 @@ class CardWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white, // Warna latar belakang kartu
         borderRadius: BorderRadius.circular(16.0), // Sudut melengkung
+        border: border,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2), // Warna bayangan

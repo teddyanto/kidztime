@@ -8,6 +8,7 @@ class TextInputWidget extends StatelessWidget {
     required this.controller,
     this.textInputAction = TextInputAction.next,
     this.maxLines = 1,
+    this.maxLength,
   });
 
   final TextEditingController controller;
@@ -15,6 +16,7 @@ class TextInputWidget extends StatelessWidget {
   final String placeholder;
   final TextInputAction textInputAction;
   final int maxLines;
+  final int? maxLength;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,7 @@ class TextInputWidget extends StatelessWidget {
           height: 5,
         ),
         TextField(
+          maxLength: maxLength,
           maxLines: maxLines,
           controller: controller,
           decoration: InputDecoration(
