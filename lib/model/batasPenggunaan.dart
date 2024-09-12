@@ -52,7 +52,9 @@ Future<void> insertOrUpdateBatasPenggunaan(
   final List<Map<String, dynamic>> existingRecords = await db.query(
     tableName,
     where: 'id = ?',
-    whereArgs: [bataspenggunaan.id],
+    whereArgs: [
+      bataspenggunaan.id,
+    ],
   );
 
   if (existingRecords.isNotEmpty) {

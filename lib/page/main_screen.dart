@@ -26,7 +26,7 @@ class MainMenuPage extends StatefulWidget {
 class _MainMenuPageState extends State<MainMenuPage> {
   final Future<Database> dbKidztime = DBKidztime().getDatabase();
   late List<Aktivitas> daftarAktivitas = [];
-  late bool batasWaktuIsRunning = false;
+  late bool _batasWaktuIsRunning = false;
   late Timer _tick;
   late DateTime _dateTimeLeft = DateTime(0, 0, 0, 0, 0, 0);
   late Bataspenggunaan? _bataspenggunaan;
@@ -93,6 +93,16 @@ class _MainMenuPageState extends State<MainMenuPage> {
       });
 
       setState(() {});
+    });
+  }
+
+  void refreshDaftarAktivitas(Future<Database> database) async {
+    final db = await database;
+
+    getAktivitas(db).then((data) {
+      setState(() {
+        daftarAktivitas = data;
+      });
     });
   }
 
@@ -207,26 +217,70 @@ class _MainMenuPageState extends State<MainMenuPage> {
                           ),
                         ],
                       ),
-                      batasWaktuIsRunning
-                          ? IconButton(
-                              onPressed: () async {
-                                buttonStartStopHandle(
-                                  context: context,
-                                );
-                              },
-                              icon: const Row(
-                                children: [
-                                  Text("Hentikan batas waktu"),
-                                  SizedBox(
-                                    width: 5,
+                      Wrap(
+                        children: [
+                          if (_batasWaktuIsRunning)
+                            Wrap(
+                              children: [
+                                IconButton(
+                                  onPressed: () async {
+                                    buttonStartStopHandle(
+                                      context: context,
+                                    );
+                                  },
+                                  icon: const Row(
+                                    children: [
+                                      FittedBox(
+                                          child: Text("Hentikan batas waktu")),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Icon(
+                                        Icons.stop_circle,
+                                      ),
+                                    ],
                                   ),
-                                  Icon(
-                                    Icons.stop_circle,
+                                ),
+                                IconButton(
+                                  onPressed: () async {
+                                    FlutterBackgroundService()
+                                        .invoke("setAsForeground");
+                                  },
+                                  icon: const Row(
+                                    children: [
+                                      FittedBox(
+                                          child: Text("Service ForeGround")),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Icon(
+                                        Icons.slideshow,
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                IconButton(
+                                  onPressed: () async {
+                                    FlutterBackgroundService()
+                                        .invoke("setAsBackground");
+                                  },
+                                  icon: const Row(
+                                    children: [
+                                      FittedBox(
+                                          child: Text("Service BackGround")),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Icon(
+                                        Icons.hide_image_rounded,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             )
-                          : IconButton(
+                          else
+                            IconButton(
                               onPressed: () async {
                                 if (_bataspenggunaan != null) {
                                   String batasWaktu =
@@ -272,12 +326,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
                               },
                               icon: Row(
                                 children: [
-                                  Text(
-                                    "Mulai batas waktu",
-                                    style: TextStyle(
-                                      color: _bataspenggunaan == null
-                                          ? Colors.grey
-                                          : Colors.black,
+                                  FittedBox(
+                                    child: Text(
+                                      "Mulai batas waktu",
+                                      style: TextStyle(
+                                        color: _bataspenggunaan == null
+                                            ? Colors.grey
+                                            : Colors.black,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(
@@ -289,9 +345,23 @@ class _MainMenuPageState extends State<MainMenuPage> {
                                 ],
                               ),
                             ),
+                          IconButton(
+                            onPressed: () {
+                              Get.toNamed("/times-up");
+                            },
+                            icon: const Row(
+                              children: [
+                                FittedBox(child: Text("Kunci device manual")),
+                                Icon(Icons.lock)
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
                       BatasWaktuBarWidget(
                         width: width,
-                        aktif: batasWaktuIsRunning,
+                        aktif: _batasWaktuIsRunning,
                         timeLeft: _dateTimeLeft,
                       ),
                       // Dummy, deleted on production
@@ -439,7 +509,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   void startTick(BuildContext context) {
-    batasWaktuIsRunning = true;
+    _batasWaktuIsRunning = true;
 
     _tick = Timer.periodic(const Duration(seconds: 1), (timer) {
       print("_dateTimeLeft $_dateTimeLeft");
@@ -467,13 +537,34 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   void stopService() {
     FlutterBackgroundService().invoke("stopService");
-    batasWaktuIsRunning = false;
-    _tick.cancel();
     DateTime currentTime = DateTime(0);
+
+    // Add new aktivitas
+    String batasWaktu = _bataspenggunaan!.batasWaktu;
+
+    int hours = int.parse(batasWaktu.split(":")[0]);
+    int minutes = int.parse(batasWaktu.split(":")[1]);
+
+    DateTime totalTime = DateTime(0, 0, 0, hours, minutes);
+    Duration alreadyRunning = totalTime.difference(_dateTimeLeft);
+
+    Aktivitas aktivitas = Aktivitas(
+      judul: _bataspenggunaan!.nama,
+      deskripsi: _bataspenggunaan!.deskripsi,
+      waktu: alreadyRunning.inSeconds,
+      tanggal: DateTime.now().toIso8601String(),
+    );
+
+    insertAktivitas(dbKidztime, aktivitas);
+
+    _batasWaktuIsRunning = false;
     _dateTimeLeft = currentTime;
-    updateStatusAktifBatasPenggunaan(dbKidztime, false);
+    _tick.cancel();
     _bataspenggunaan = null;
+
     Preferences.setLockTime(hours: 0, minutes: 0, seconds: 0);
+    updateStatusAktifBatasPenggunaan(dbKidztime, false);
+    refreshDaftarAktivitas(dbKidztime);
 
     setState(() {});
   }
@@ -899,8 +990,10 @@ class AktivitasPenggunanWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> splittedTanggal = dataAktivitas.tanggal.split("-");
-    String formattedTanggal = "${splittedTanggal[2]}/${splittedTanggal[1]}";
+    DateTime tanggal = DateTime.parse(dataAktivitas.tanggal);
+
+    String formattedTanggal =
+        "${tanggal.day.toString().padLeft(2, "0")}/${tanggal.month.toString().padLeft(2, "0")}";
 
     int jam = (dataAktivitas.waktu / 3600).floor();
     int menit = (dataAktivitas.waktu % 3600 / 60).floor();
@@ -926,18 +1019,19 @@ class AktivitasPenggunanWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    dataAktivitas.judul,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: WidgetUtil().parseHexColor(darkColor),
+                  Expanded(
+                    child: Text(
+                      dataAktivitas.judul,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: WidgetUtil().parseHexColor(darkColor),
+                      ),
                     ),
                   ),
                   Text(
                     formattedTanggal,
                     style: const TextStyle(
-                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.grey,
                     ),

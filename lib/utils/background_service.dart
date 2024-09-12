@@ -52,7 +52,7 @@ void onStart(ServiceInstance service) async {
         if (await service.isForegroundService()) {
           service.setForegroundNotificationInfo(
             title: "Kidztime service",
-            content: "Updated at ${DateTime.now()}",
+            content: "Device will lock at $lockTime",
           );
         }
       }

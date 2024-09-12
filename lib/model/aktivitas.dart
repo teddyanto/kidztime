@@ -5,14 +5,14 @@ import 'package:sqflite/sqflite.dart';
 const tableName = "Aktivitas";
 
 class Aktivitas {
-  final int id;
+  int? id;
   final String judul;
   final String deskripsi;
   final int waktu;
   final String tanggal;
 
   Aktivitas({
-    required this.id,
+    id,
     required this.judul,
     required this.deskripsi,
     required this.waktu,
@@ -51,11 +51,15 @@ Future<void> insertAktivitas(
   // `conflictAlgorithm` to use in case the same aktivitas is inserted twice.
   //
   // In this case, replace any previous data.
-  await db.insert(
+  await db
+      .insert(
     tableName,
     aktivitas.toMap(),
     conflictAlgorithm: ConflictAlgorithm.replace,
-  );
+  )
+      .then((e) {
+    print("Data insert in the database: ${aktivitas.toString()}");
+  });
 }
 
 // A method that retrieves all the aktivitas from the Aktivitas table.
@@ -64,7 +68,10 @@ Future<List<Aktivitas>> getAktivitas(Database database) async {
   final db = database;
 
   // Query the table for all the aktivitas.
-  final List<Map<String, Object?>> aktivitasMaps = await db.query(tableName);
+  final List<Map<String, Object?>> aktivitasMaps = await db.query(
+    tableName,
+    orderBy: 'id DESC',
+  );
 
   // Convert the list of each aktivitas fields into a list of `Aktivitas` objects.
   return [

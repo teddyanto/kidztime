@@ -296,41 +296,57 @@ class _ListTimeLimitScreenState extends State<ListTimeLimitScreen> {
                                                   Icons.delete,
                                                 ),
                                               ),
-                                            !item.statusAktif
-                                                ? IconButton.filledTonal(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 20,
-                                                    ),
-                                                    onPressed: () {
-                                                      handleActivationBatasWaktu(
-                                                          item, context);
-                                                    },
-                                                    icon: const Text(
-                                                      "Aktifkan",
-                                                    ),
-                                                  )
-                                                : IconButton.filledTonal(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 20,
-                                                    ),
-                                                    onPressed: () {
-                                                      updateStatusAktifBatasPenggunaan(
-                                                              dbKidztime, false)
-                                                          .then((e) {
-                                                        refreshBatasPenggunaan();
-                                                      });
-                                                    },
-                                                    icon: const Text(
-                                                      "Nonaktifkan",
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
+                                            if (!item.statusAktif)
+                                              IconButton.filledTonal(
+                                                color: WidgetUtil()
+                                                    .parseHexColor(darkColor),
+                                                onPressed: () async {
+                                                  final result =
+                                                      await Get.toNamed(
+                                                    "/time-limit",
+                                                    arguments: item,
+                                                  );
+                                                  refreshBatasPenggunaan();
+                                                },
+                                                icon: const Icon(
+                                                  Icons.edit,
+                                                ),
+                                              ),
+                                            if (!item.statusAktif)
+                                              IconButton.filledTonal(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 20,
+                                                ),
+                                                onPressed: () {
+                                                  handleActivationBatasWaktu(
+                                                      item, context);
+                                                },
+                                                icon: const Text(
+                                                  "Aktifkan",
+                                                ),
+                                              )
+                                            else
+                                              IconButton.filledTonal(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 20,
+                                                ),
+                                                onPressed: () {
+                                                  updateStatusAktifBatasPenggunaan(
+                                                          dbKidztime, false)
+                                                      .then((e) {
+                                                    refreshBatasPenggunaan();
+                                                  });
+                                                },
+                                                icon: const Text(
+                                                  "Nonaktifkan",
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
+                                                ),
+                                              ),
                                           ],
                                         )
                                       ],
