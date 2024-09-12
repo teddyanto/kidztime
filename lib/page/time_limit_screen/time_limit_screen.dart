@@ -14,27 +14,42 @@ import 'package:kidztime/utils/widget_util.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TimeLimitScreen extends StatefulWidget {
-  TimeLimitScreen({super.key});
-
-  //controllers
-  late TextEditingController namaController = TextEditingController();
-  late TextEditingController deskripsiController = TextEditingController();
-  late TextEditingController bataswaktuController = TextEditingController();
-  late TextEditingController toleransiController = TextEditingController();
-
-  late Future<Database> dbKidztime = DBKidztime().getDatabase();
+  const TimeLimitScreen({super.key});
 
   @override
   _TimeLimitScreenState createState() => _TimeLimitScreenState();
 }
 
 class _TimeLimitScreenState extends State<TimeLimitScreen> {
+//controllers
+  final TextEditingController namaController = TextEditingController();
+  final TextEditingController deskripsiController = TextEditingController();
+  final TextEditingController bataswaktuController = TextEditingController();
+  final TextEditingController toleransiController = TextEditingController();
+  late int? id;
+
+  final Future<Database> dbKidztime = DBKidztime().getDatabase();
+
   //variable for storing selected status
   bool _selectedStatus = true;
+  late Bataspenggunaan _bataspenggunaan;
 
   @override
   void initState() {
     super.initState();
+    id = -1;
+
+    if (Get.arguments != null) {
+      final args = Get.arguments;
+      _bataspenggunaan = args;
+
+      id = _bataspenggunaan.id;
+      namaController.text = _bataspenggunaan.nama;
+      deskripsiController.text = _bataspenggunaan.deskripsi;
+      bataswaktuController.text = _bataspenggunaan.batasWaktu;
+      toleransiController.text = _bataspenggunaan.batasToleransi;
+      _selectedStatus = _bataspenggunaan.statusAktif;
+    }
   }
 
   @override
@@ -71,7 +86,7 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
                         children: [
                           TextInputWidget(
                             maxLength: 20,
-                            controller: widget.namaController,
+                            controller: namaController,
                             title: "Nama Batasan",
                             placeholder: "Masukkan nama batasan",
                           ),
@@ -80,7 +95,7 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
                           ),
                           TextInputWidget(
                             maxLength: 150,
-                            controller: widget.deskripsiController,
+                            controller: deskripsiController,
                             title: "Deskripsi",
                             placeholder: "Masukkan deskripsi",
                             maxLines: 3,
@@ -90,34 +105,30 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
                             height: 10.0,
                           ),
                           TimeInputWidget(
-                            controller: widget.bataswaktuController,
+                            controller: bataswaktuController,
                             title: "Batas Waktu",
                             hint: "Tekan di sini",
-                            initialTime: widget.bataswaktuController.text == ''
+                            initialTime: bataswaktuController.text == ''
                                 ? const TimeOfDay(hour: 0, minute: 0)
                                 : TimeOfDay(
-                                    hour: int.parse(widget
-                                        .bataswaktuController.text
+                                    hour: int.parse(bataswaktuController.text
                                         .split(":")[0]),
-                                    minute: int.parse(widget
-                                        .bataswaktuController.text
+                                    minute: int.parse(bataswaktuController.text
                                         .split(":")[1])),
                           ),
                           const SizedBox(
                             height: 10.0,
                           ),
                           TimeInputWidget(
-                            controller: widget.toleransiController,
+                            controller: toleransiController,
                             title: "Toleransi",
                             hint: "Tekan di sini",
-                            initialTime: widget.toleransiController.text == ""
+                            initialTime: toleransiController.text == ""
                                 ? const TimeOfDay(hour: 0, minute: 5)
                                 : TimeOfDay(
-                                    hour: int.parse(widget
-                                        .toleransiController.text
-                                        .split(":")[0]),
-                                    minute: int.parse(widget
-                                        .toleransiController.text
+                                    hour: int.parse(
+                                        toleransiController.text.split(":")[0]),
+                                    minute: int.parse(toleransiController.text
                                         .split(":")[1])),
                           ),
                           const SizedBox(
@@ -143,7 +154,7 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
                                 color: Colors.transparent,
                                 child: InkWell(
                                   onTap: () {
-                                    _saveTimeLimit();
+                                    saveTimeLimit();
                                   },
                                   borderRadius: BorderRadius.circular(10.0),
                                   splashColor: Colors.amber,
@@ -177,7 +188,7 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
     );
   }
 
-  void _saveTimeLimit() {
+  void saveTimeLimit() {
     if (validateInput()) {
       WidgetUtil().customeDialog(
         context: context,
@@ -205,19 +216,19 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.namaController.text,
+                      namaController.text,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      widget.deskripsiController.text,
+                      deskripsiController.text,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      widget.bataswaktuController.text,
+                      bataswaktuController.text,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      widget.toleransiController.text,
+                      toleransiController.text,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
@@ -234,19 +245,19 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
           // save data to database
           //saveData();
           Bataspenggunaan bataspenggunaan = Bataspenggunaan(
-            nama: widget.namaController.text,
-            deskripsi: widget.deskripsiController.text,
-            batasWaktu: widget.bataswaktuController.text,
-            batasToleransi: widget.toleransiController.text,
+            id: id,
+            nama: namaController.text,
+            deskripsi: deskripsiController.text,
+            batasWaktu: bataswaktuController.text,
+            batasToleransi: toleransiController.text,
             statusAktif: _selectedStatus, // Save as boolean
           );
 
           if (bataspenggunaan.statusAktif) {
-            updateStatusAktifBatasPenggunaan(widget.dbKidztime, false);
+            updateStatusAktifBatasPenggunaan(dbKidztime, false);
           }
 
-          insertOrUpdateBatasPenggunaan(widget.dbKidztime, bataspenggunaan)
-              .then((e) {
+          insertOrUpdateBatasPenggunaan(dbKidztime, bataspenggunaan).then((e) {
             // Print the data that was just inserted
             print('Data added to database: $bataspenggunaan');
 
@@ -261,7 +272,9 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
               WidgetUtil().customeDialog(
                 context: context,
                 title: "Berhasil",
-                detail: [const Text("Data berhasil disimpan")],
+                detail: [
+                  const Text("Data berhasil disimpan"),
+                ],
                 okButtonText: "OK",
                 okButtonFunction: () {
                   Navigator.of(context).pop();
@@ -279,22 +292,22 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
   }
 
   bool validateInput() {
-    if (widget.namaController.text.isEmpty) {
+    if (namaController.text.isEmpty) {
       WidgetUtil().showToast(msg: "Nama tidak boleh kosong");
       return false;
     }
 
-    if (widget.deskripsiController.text.isEmpty) {
+    if (deskripsiController.text.isEmpty) {
       WidgetUtil().showToast(msg: "Deskripsi tidak boleh kosong");
       return false;
     }
 
-    if (widget.bataswaktuController.text.isEmpty) {
+    if (bataswaktuController.text.isEmpty) {
       WidgetUtil().showToast(msg: "Batas Waktu tidak boleh kosong");
       return false;
     }
 
-    if (widget.toleransiController.text.isEmpty) {
+    if (toleransiController.text.isEmpty) {
       WidgetUtil().showToast(msg: "Toleransi tidak boleh kosong");
       return false;
     }

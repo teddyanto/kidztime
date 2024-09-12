@@ -1,5 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.binus.kidztime">
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    
     <application
         android:label="kidztime"
         android:name="${applicationName}"
@@ -45,8 +51,5 @@
         </intent>
          <package android:name="com.binus.kidztime" />
     </queries>
-
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
 
 </manifest>

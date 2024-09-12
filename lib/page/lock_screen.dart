@@ -19,7 +19,9 @@ class LockPage extends StatefulWidget {
 class _LockPageState extends State<LockPage> {
   late List<TextEditingController> sandiControllers;
   late Future<Database> dbKidztime;
+
   String? sandi;
+  bool isValid = true;
 
   @override
   void initState() {
@@ -34,6 +36,12 @@ class _LockPageState extends State<LockPage> {
         });
       });
     });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
@@ -84,27 +92,39 @@ class _LockPageState extends State<LockPage> {
                 passwordHandleCheck(sandiControllers, sandi ?? DEFAULT_KEY);
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 5),
+            if (!isValid)
+              const Text(
+                "Sandi yang anda masukkan tidak benar",
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
           ],
         ),
       ),
     );
   }
-}
 
-void passwordHandleCheck(List<TextEditingController> input, String sandi) {
-  bool valid = true;
+  void passwordHandleCheck(List<TextEditingController> input, String sandi) {
+    bool valid = true;
 
-  print(sandi);
-  String inputKey = "";
-  for (var item in input) {
-    print(item.text);
-    inputKey += item.text;
-  }
+    print(sandi);
+    String inputKey = "";
+    for (var item in input) {
+      print(item.text);
+      inputKey += item.text;
+    }
 
-  if (inputKey == sandi) {
-    Get.offAndToNamed("/main-menu");
-  } else {
-    print("Salah euy");
+    if (inputKey == sandi) {
+      Get.offAndToNamed("/main-menu");
+    } else {
+      for (TextEditingController item in sandiControllers) {
+        item.text = "";
+      }
+
+      isValid = false;
+      setState(() {});
+    }
   }
 }

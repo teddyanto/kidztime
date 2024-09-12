@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -76,24 +74,27 @@ class _FourLetterInputState extends State<FourLetterInput> {
                   if (text.isEmpty && index > 0) {
                     FocusScope.of(context).previousFocus();
                   } else {
-                    Timer(const Duration(milliseconds: 300), () {
-                      if (text.length == 1 && index < 3) {
-                        FocusScope.of(context).nextFocus();
-                        widget.controllers[index + 1].selection = TextSelection(
-                          baseOffset: 0,
-                          extentOffset:
-                              widget.controllers[index + 1].value.text.length,
-                        );
-                      }
-                    });
+                    if (text.length == 1 && index < 3) {
+                      FocusScope.of(context).nextFocus();
+                      widget.controllers[index + 1].selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset:
+                            widget.controllers[index + 1].value.text.length,
+                      );
+                    }
+                    // Timer(const Duration(milliseconds: 300), () {
+
+                    // });
                   }
                 },
                 onEditingComplete: () {
                   if (widget.controllers[index].text.isNotEmpty && index == 3) {
-                    print("Clickedxx");
                     widget.passwordHandleCheck();
+                    FocusScope.of(context).unfocus();
                   } else {
-                    FocusScope.of(context).nextFocus();
+                    if (widget.controllers[index].text.isNotEmpty) {
+                      FocusScope.of(context).nextFocus();
+                    }
                   }
                 },
               ),
