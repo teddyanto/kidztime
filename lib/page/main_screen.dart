@@ -204,7 +204,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             icon: iconMenu3,
                             title: "Lihat Aktivitas Gawai",
                             callBack: () {
-                              print("Clicked");
+                              Get.toNamed('/activity-page');
                             },
                           ),
                           MenuWidget(

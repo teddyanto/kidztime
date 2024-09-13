@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:kidztime/activity_screen.dart';
 import 'package:kidztime/page/lock_screen.dart';
 import 'package:kidztime/page/main_screen.dart';
 import 'package:kidztime/page/setup_screen.dart';
@@ -50,6 +51,11 @@ class Routes {
       GetPage(
         name: '/schedule-page',
         page: () => ScheduleScreen(),
+        transition: Transition.rightToLeft,
+      ),
+      GetPage(
+        name: '/activity-page',
+        page: () => ActivityHistoryScreen(),
         transition: Transition.rightToLeft,
       ),
     ];
