@@ -118,6 +118,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
     }
 
     setState(() {});
+    print("refreshBatasPenggunaan");
   }
 
   @override
@@ -187,6 +188,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             callBack: () async {
                               final result =
                                   await Get.toNamed("/list-time-limit");
+
                               _bataspenggunaan = result;
                               refreshBatasPenggunaan();
                             },

@@ -37,7 +37,7 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
   @override
   void initState() {
     super.initState();
-    id = -1;
+    id = null;
 
     if (Get.arguments != null) {
       final args = Get.arguments;
