@@ -36,10 +36,10 @@ void onStart(ServiceInstance service) async {
         print('FLUTTER BACKGROUND SERVICE time: $lockTime');
         if (now.isAfter(lockTime)) {
           print("UDAH LEWAT CUYYY WAKTU NYA");
-          timer.cancel();
           await LaunchApp.openApp(
             androidPackageName: 'com.binus.kidztime',
           );
+          timer.cancel();
 
           try {
             // Ensure the service instance is used
