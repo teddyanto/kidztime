@@ -2,17 +2,26 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:external_app_launcher/external_app_launcher.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:kidztime/model/aktivitas.dart';
+import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/preferences.dart';
+import 'package:sqflite/sqflite.dart';
+
+const appPackage = 'com.binus.kidztime';
+const youtubePackage = 'com.google.android.youtube';
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
 
   late Timer timer;
+  final Future<Database> dbKidztime = DBKidztime().getDatabase();
 
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
+      print("setAsForeground");
       service.setAsForegroundService();
     });
 
@@ -22,37 +31,26 @@ void onStart(ServiceInstance service) async {
   }
 
   service.on('stopService').listen((event) {
-    service.stopSelf();
-    timer.cancel();
-    print("SERVICE STOPPED !");
+    serviceStopped(dbKidztime, timer, service);
   });
 
   await Preferences.getLockTime().then((lockTime) {
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+    timer = Timer.periodic(const Duration(seconds: 1), (a) async {
       if (service is AndroidServiceInstance) {
         DateTime now = DateTime.now();
 
-        print('FLUTTER BACKGROUND SERVICE: $now');
-        print('FLUTTER BACKGROUND SERVICE time: $lockTime');
+        print("LOCK AT $lockTime");
         if (now.isAfter(lockTime)) {
-          print("UDAH LEWAT CUYYY WAKTU NYA");
-          await LaunchApp.openApp(
-            androidPackageName: 'com.binus.kidztime',
-          );
-          timer.cancel();
-
-          try {
-            // Ensure the service instance is used
-            service.invoke('stopService');
-          } catch (e) {
-            print("Error invoking 'stopService': $e");
-          }
+          print("WAKTU SUDAH HABIS");
+          serviceStopped(dbKidztime, timer, service).then((value) {
+            openApp();
+          });
         }
 
         if (await service.isForegroundService()) {
           service.setForegroundNotificationInfo(
             title: "Kidztime service",
-            content: "Device will lock at $lockTime",
+            content: "Device akan terkunci pada $lockTime",
           );
         }
       }
@@ -60,6 +58,44 @@ void onStart(ServiceInstance service) async {
   });
 
   // bring to foreground
+}
+
+Future<void> serviceStopped(
+  Future<Database> dbKidztime,
+  Timer timer,
+  ServiceInstance service,
+) async {
+  Preferences.getTempAktivitas().then((tempAktivitas) {
+    DateTime now = DateTime.now();
+    DateTime startTime = DateTime.parse(tempAktivitas.tanggal);
+    print("SERVICE DIHENTIKAN $now");
+    Duration alreadyRunning = now.difference(startTime);
+
+    Aktivitas aktivitas = Aktivitas(
+      judul: tempAktivitas.judul,
+      deskripsi: tempAktivitas.deskripsi,
+      waktu: alreadyRunning.inSeconds,
+      tanggal: tempAktivitas.tanggal,
+    );
+
+    insertAktivitas(dbKidztime, aktivitas);
+
+    timer.cancel();
+
+    Timer(const Duration(seconds: 1), () {
+      service.stopSelf();
+    });
+  });
+}
+
+Future<void> openApp() async {
+  try {
+    await LaunchApp.openApp(
+      androidPackageName: appPackage,
+    );
+  } on PlatformException catch (e) {
+    print("Failed to bring app to foreground: '${e.message}'.");
+  }
 }
 
 @pragma('vm:entry-point')

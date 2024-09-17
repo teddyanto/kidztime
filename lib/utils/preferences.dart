@@ -1,3 +1,4 @@
+import 'package:kidztime/model/aktivitas.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Preferences {
@@ -43,5 +44,31 @@ class Preferences {
     DateTime lockTime = DateTime.parse(lockTimeString);
     print("getLockTime called: $lockTimeString");
     return lockTime;
+  }
+
+  static Future<void> setTempAktivitas({
+    required Aktivitas aktivitas,
+  }) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    pref.setString("aktivitas_judul", aktivitas.judul);
+    pref.setString("aktivitas_deskripsi", aktivitas.deskripsi);
+    pref.setString("aktivitas_tanggal", aktivitas.tanggal);
+  }
+
+  static Future<Aktivitas> getTempAktivitas() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    // Get JSON string from SharedPreferences
+    String? aktivitasJudul = pref.getString("aktivitas_judul");
+    String? aktivitasDeskripsi = pref.getString("aktivitas_deskripsi");
+    String? aktivitasTanggal = pref.getString("aktivitas_tanggal");
+
+    Aktivitas aktivitas = Aktivitas(
+      judul: aktivitasJudul ?? "",
+      deskripsi: aktivitasDeskripsi ?? "",
+      waktu: 0,
+      tanggal: aktivitasTanggal ?? "",
+    );
+    return aktivitas;
   }
 }

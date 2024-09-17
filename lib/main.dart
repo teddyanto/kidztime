@@ -10,6 +10,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize android_alarm_manager_plus
 
   // Initialize database
   databaseInitialize();
@@ -37,15 +38,12 @@ Future main() async {
   if (isRunning) {
     await Preferences.getLockTime().then((lockTime) {
       if (now.isAfter(lockTime)) {
-        Preferences.setTemp(text: "now.isAfter(lockTime)");
         runApp(const TimesUpPage());
       } else {
-        Preferences.setTemp(text: "else 1");
         runApp(const MainPage());
       }
     });
   } else {
-    Preferences.setTemp(text: "else 2");
     runApp(const MainPage());
   }
 

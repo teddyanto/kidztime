@@ -7,11 +7,13 @@ class FourLetterInput extends StatefulWidget {
     required this.passwordHandleCheck,
     required this.controllers,
     this.obscureText = true,
+    this.lockPage = false,
   });
 
   final Function passwordHandleCheck;
   final List<TextEditingController> controllers;
   bool obscureText;
+  bool lockPage;
 
   @override
   _FourLetterInputState createState() => _FourLetterInputState();
@@ -81,10 +83,11 @@ class _FourLetterInputState extends State<FourLetterInput> {
                         extentOffset:
                             widget.controllers[index + 1].value.text.length,
                       );
+                    } else if (text.length == 1 &&
+                        index == 3 &&
+                        widget.lockPage) {
+                      widget.passwordHandleCheck();
                     }
-                    // Timer(const Duration(milliseconds: 300), () {
-
-                    // });
                   }
                 },
                 onEditingComplete: () {
