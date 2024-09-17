@@ -31,6 +31,17 @@ class Aktivitas {
     };
   }
 
+  // Convert an Aktivitas into JSON format.
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'judul': judul,
+      'deskripsi': deskripsi,
+      'waktu': waktu,
+      'tanggal': tanggal,
+    };
+  }
+
   // Implement toString to make it easier to see information about
   // each Aktivitas when using the print statement.
   @override

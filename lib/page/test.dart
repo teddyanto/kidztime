@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kidztime/page/main_screen.dart';
+import 'package:kidztime/page/widget/main_screen_widget.dart';
 import 'package:kidztime/utils/png_assets.dart';
 
 class TestScreen extends StatelessWidget {

@@ -91,6 +91,7 @@ class _LockPageState extends State<LockPage> {
               passwordHandleCheck: () {
                 passwordHandleCheck(sandiControllers, sandi ?? DEFAULT_KEY);
               },
+              lockPage: true,
             ),
             const SizedBox(height: 5),
             if (!isValid)
@@ -122,6 +123,7 @@ class _LockPageState extends State<LockPage> {
       for (TextEditingController item in sandiControllers) {
         item.text = "";
       }
+      FocusScope.of(context).unfocus();
 
       isValid = false;
       setState(() {});
