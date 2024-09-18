@@ -80,3 +80,41 @@ Future<Jadwalpenggunaan?> getJadwalByHari(
   }
   return null;
 }
+
+Future<void> deleteJadwalPenggunaan(Future<Database> database, int id) async {
+  final db = await database;
+  await db.delete(
+    'Jadwal_penggunaan',
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+}
+
+Future<List<Jadwalpenggunaan>> getAllJadwalPenggunaan(Database database) async {
+  final db = database;
+  final List<Map<String, Object?>> maps = await db.query(tableName);
+
+  return [
+    for (final map in maps)
+      Jadwalpenggunaan(
+        id: map['id'] as int?,
+        hari: map['hari'] as String,
+        waktuMulai: map['waktu_mulai'] as String,
+        waktuAkhir: map['waktu_akhir'] as String,
+        statusAktif: (map['status_aktif'] as int) == 1,
+      )
+  ];
+}
+
+Future<void> updateStatusAktifJadwal(
+  Future<Database> dbKidztime,
+  bool statusAktif,
+) async {
+  final db = await dbKidztime;
+  int statusAktifValue = statusAktif ? 1 : 0;
+  int count = await db.update(
+    tableName,
+    {'status_aktif': statusAktifValue},
+  );
+  print('Updated $count records');
+}

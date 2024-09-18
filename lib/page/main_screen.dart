@@ -6,6 +6,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/aktivitas.dart';
 import 'package:kidztime/model/batasPenggunaan.dart';
+import 'package:kidztime/model/jadwalPenggunaan.dart';
 import 'package:kidztime/model/pengaturan.dart';
 import 'package:kidztime/page/widget/main_screen_widget.dart';
 import 'package:kidztime/utils/background_service.dart';
@@ -206,8 +207,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             width: width,
                             icon: iconMenu2,
                             title: "Atur Jadwal Penggunaan",
-                            callBack: () {
-                              Get.toNamed('/schedule-page');
+                            callBack: () async {
+                              // Get.toNamed('/schedule-page');
+                              // Get.toNamed('/list-schedule');
+                              final result =
+                                  await Get.toNamed("/list-schedule");
                             },
                           ),
                           MenuWidget(

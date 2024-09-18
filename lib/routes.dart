@@ -1,11 +1,12 @@
 import 'package:get/get.dart';
 import 'package:kidztime/activity_screen.dart';
+import 'package:kidztime/page/schedule_screen/list_schedule_screen.dart';
 import 'package:kidztime/page/lock_screen.dart';
 import 'package:kidztime/page/main_screen.dart';
 import 'package:kidztime/page/setup_screen.dart';
 import 'package:kidztime/page/time_limit_screen/list_time_limit_screen.dart';
 import 'package:kidztime/page/time_limit_screen/time_limit_screen.dart';
-import 'package:kidztime/schedule_screen.dart';
+import 'package:kidztime/page/schedule_screen/schedule_screen.dart';
 import 'package:kidztime/splash_screen.dart';
 import 'package:kidztime/times_up_screen.dart';
 
@@ -46,6 +47,11 @@ class Routes {
       GetPage(
         name: '/time-limit',
         page: () => TimeLimitScreen(),
+        transition: Transition.rightToLeft,
+      ),
+      GetPage(
+        name: '/list-schedule',
+        page: () => const ListScheduleScreen(),
         transition: Transition.rightToLeft,
       ),
       GetPage(
