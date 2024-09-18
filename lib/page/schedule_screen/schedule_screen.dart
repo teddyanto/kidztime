@@ -188,7 +188,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         okButtonText: "OK",
         okButtonFunction: () {
           Navigator.of(context).pop();
-          Get.offAndToNamed('/main-menu');
+          // Get.offAndToNamed('/list-schedule');
+          Get.back(result: "added");
         },
       );
     } else {
