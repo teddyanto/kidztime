@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/jadwalPenggunaan.dart';
@@ -21,7 +20,6 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
   late TextEditingController searchController = TextEditingController();
   final Future<Database> dbKidztime = DBKidztime().getDatabase();
   late List<Jadwalpenggunaan> listJadwal = [];
-
   late List<Jadwalpenggunaan> resultSearch = [];
   late Timer timerSearch = Timer(Duration.zero, () {});
   late Jadwalpenggunaan? jadwalAktif;
@@ -44,18 +42,12 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
             final result = await Get.toNamed("/schedule-page");
             if (result != null && result == "added") {
               refreshJadwal();
-              print(result);
             }
           },
-          icon: const Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.add, color: Colors.white),
           label: const Text(
             "Tambah jadwal baru",
-            style: TextStyle(
-              color: Colors.white,
-            ),
+            style: TextStyle(color: Colors.white),
           ),
         ),
       ),
@@ -65,18 +57,14 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
           HeaderWidget(
             titleScreen: "Jadwal Tersimpan",
             callback: () {
-              Get.back(
-                result: jadwalAktif,
-              );
+              Get.back(result: jadwalAktif);
             },
             hasBackButton: true,
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 5.0,
-                horizontal: 10.0,
-              ),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
               child: Column(
                 children: [
                   Stack(
@@ -85,27 +73,20 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                         decoration: const InputDecoration(
                           contentPadding:
                               EdgeInsets.symmetric(horizontal: 10.0),
-                          hintText: "Pencarian", // Placeholder
+                          hintText: "Pencarian",
                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey,
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10.0),
-                            ),
+                            borderSide: BorderSide(color: Colors.grey),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.blue,
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10.0),
-                            ),
+                            borderSide: BorderSide(color: Colors.blue),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
                         ),
                         textInputAction: TextInputAction.done,
                         autocorrect: false,
-                        autofocus: false,
                         controller: searchController,
                         onChanged: (value) {
                           List<Jadwalpenggunaan> temp = [];
@@ -113,15 +94,13 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                           if (timerSearch.isActive) {
                             timerSearch.cancel();
                           }
-                          print(listJadwal);
 
                           timerSearch =
                               Timer(const Duration(milliseconds: 500), () {
-                            if (value == "") {
+                            if (value.isEmpty) {
                               temp = listJadwal;
                             } else {
-                              for (var i = 0; i < listJadwal.length; i++) {
-                                var item = listJadwal[i];
+                              for (var item in listJadwal) {
                                 if (item.hari
                                         .toUpperCase()
                                         .contains(value.toUpperCase()) ||
@@ -138,7 +117,7 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                         },
                       ),
                       Positioned(
-                        right: searchController.text != "" ? 0 : -100,
+                        right: searchController.text.isNotEmpty ? 0 : -100,
                         child: IconButton(
                           onPressed: () {
                             setState(() {
@@ -152,9 +131,14 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                   ),
                   Expanded(
                     child: ListView.builder(
-                      itemCount: resultSearch.length,
+                      itemCount: groupJadwal(resultSearch).length,
                       itemBuilder: (context, index) {
-                        var item = resultSearch[index];
+                        var entry =
+                            groupJadwal(resultSearch).entries.elementAt(index);
+                        var items = entry.value;
+
+                        // Use the first item for display purposes
+                        var item = items.first;
 
                         return Dismissible(
                           key: Key(item.id.toString()),
@@ -172,16 +156,8 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                             border: Border(
                               top: BorderSide(
                                 color: WidgetUtil().parseHexColor(
-                                    item.statusAktif
-                                        ? darkColor
-                                        : primaryColor),
-                                width: 4,
-                              ),
-                              right: BorderSide(
-                                color: WidgetUtil().parseHexColor(
-                                    item.statusAktif
-                                        ? darkColor
-                                        : primaryColor),
+                                  item.statusAktif ? darkColor : primaryColor,
+                                ),
                                 width: 4,
                               ),
                             ),
@@ -189,19 +165,22 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Expanded(
-                                      child: Text(
-                                        item.hari,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                    Text(
+                                      "Jadwal Harian",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        color: item.statusAktif
+                                            ? Colors.black
+                                            : Colors.grey[600],
                                       ),
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 3),
+                                          horizontal: 10, vertical: 5),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(5),
                                         color: WidgetUtil().parseHexColor(
@@ -213,119 +192,114 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                                       child: Text(
                                         item.statusAktif
                                             ? "Sedang Aktif"
-                                            : "Tidak aktif",
+                                            : "Tidak Aktif",
                                         style: const TextStyle(
-                                          color: Colors.white,
-                                        ),
+                                            color: Colors.white),
                                       ),
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 10),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Text("Waktu Mulai: ",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            const Icon(Icons.access_time),
-                                            Text(
-                                              item.waktuMulai,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                            height:
-                                                8), // Add vertical space between "Waktu Mulai" and "Waktu Akhir"
-                                        Row(
-                                          children: [
-                                            const Text("Waktu Akhir: ",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            const Icon(Icons.access_time),
-                                            Text(
-                                              item.waktuAkhir,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                    const Icon(Icons.access_time,
+                                        color: Colors.black54),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      "Mulai: ${item.waktuMulai} - Akhir: ${item.waktuAkhir}",
+                                      style: TextStyle(color: Colors.black87),
                                     ),
-                                    Wrap(
-                                      children: [
-                                        if (!item.statusAktif)
-                                          IconButton.filledTonal(
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Wrap(
+                                  children: List.generate(7, (i) {
+                                    String day = [
+                                      'Senin',
+                                      'Selasa',
+                                      'Rabu',
+                                      'Kamis',
+                                      'Jumat',
+                                      'Sabtu',
+                                      'Minggu'
+                                    ][i];
+                                    bool hasSchedule = items.any((e) =>
+                                        e.hari.toUpperCase() ==
+                                        day.toUpperCase());
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5),
+                                      margin: const EdgeInsets.only(right: 4),
+                                      decoration: BoxDecoration(
+                                        color: hasSchedule
+                                            ? Colors.green
+                                            : Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Text(
+                                        day,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: hasSchedule
+                                              ? Colors.white
+                                              : Colors.black54,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    if (!item.statusAktif)
+                                      IconButton.filledTonal(
+                                        color: Colors.red,
+                                        onPressed: () {
+                                          handleDeleteJadwal(index, context);
+                                        },
+                                        icon: const Icon(Icons.delete),
+                                      ),
+                                    if (!item.statusAktif)
+                                      IconButton.filledTonal(
+                                        color: WidgetUtil()
+                                            .parseHexColor(darkColor),
+                                        onPressed: () async {
+                                          final result = await Get.toNamed(
+                                              "/time-limit",
+                                              arguments: item);
+                                          refreshJadwal();
+                                        },
+                                        icon: const Icon(Icons.edit),
+                                      ),
+                                    if (!item.statusAktif)
+                                      IconButton.filledTonal(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        onPressed: () {
+                                          handleActivationJadwal(item, context);
+                                        },
+                                        icon: const Text("Aktifkan"),
+                                      )
+                                    else
+                                      IconButton.filledTonal(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        onPressed: () {
+                                          updateStatusAktifJadwal(
+                                                  dbKidztime, false)
+                                              .then((e) {
+                                            refreshJadwal();
+                                          });
+                                        },
+                                        icon: const Text(
+                                          "Nonaktifkan",
+                                          style: TextStyle(
                                             color: Colors.red,
-                                            onPressed: () {
-                                              handleDeleteJadwal(
-                                                  index, context);
-                                            },
-                                            icon: const Icon(
-                                              Icons.delete,
-                                            ),
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                        if (!item.statusAktif)
-                                          IconButton.filledTonal(
-                                            color: WidgetUtil()
-                                                .parseHexColor(darkColor),
-                                            onPressed: () async {
-                                              final result = await Get.toNamed(
-                                                "/time-limit",
-                                                arguments: item,
-                                              );
-                                              refreshJadwal();
-                                            },
-                                            icon: const Icon(
-                                              Icons.edit,
-                                            ),
-                                          ),
-                                        if (!item.statusAktif)
-                                          IconButton.filledTonal(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 20,
-                                            ),
-                                            onPressed: () {
-                                              handleActivationJadwal(
-                                                  item, context);
-                                            },
-                                            icon: const Text(
-                                              "Aktifkan",
-                                            ),
-                                          )
-                                        else
-                                          IconButton.filledTonal(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 20,
-                                            ),
-                                            onPressed: () {
-                                              updateStatusAktifJadwal(
-                                                      dbKidztime, false)
-                                                  .then((e) {
-                                                refreshJadwal();
-                                              });
-                                            },
-                                            icon: const Text(
-                                              "Nonaktifkan",
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                      ],
-                                    )
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ],
@@ -338,10 +312,26 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
+  }
+
+  Map<String, List<Jadwalpenggunaan>> groupJadwal(
+      List<Jadwalpenggunaan> jadwals) {
+    Map<String, List<Jadwalpenggunaan>> groupedJadwals = {};
+
+    for (var jadwal in jadwals) {
+      String key = "${jadwal.waktuMulai}-${jadwal.waktuAkhir}";
+
+      if (!groupedJadwals.containsKey(key)) {
+        groupedJadwals[key] = [];
+      }
+      groupedJadwals[key]!.add(jadwal);
+    }
+
+    return groupedJadwals;
   }
 
   void handleActivationJadwal(Jadwalpenggunaan item, BuildContext context) {
@@ -394,15 +384,7 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
         listJadwal = jadwalPenggunaan;
         resultSearch = jadwalPenggunaan;
 
-        // Example: Additional logic for active schedules if needed
-        // (Modify based on your app's requirements)
         jadwalAktif = null;
-        for (var i = 0; i < jadwalPenggunaan.length; i++) {
-          var item = jadwalPenggunaan[i];
-          if (item.statusAktif) {
-            jadwalAktif = item;
-          }
-        }
 
         setState(() {});
         print("jadwalAktif ${jadwalAktif?.hari}");
