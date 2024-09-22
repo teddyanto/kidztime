@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 class CardWidget extends StatelessWidget {
-  const CardWidget(
-      {super.key,
-      required this.child,
-      required this.verticalMargin,
-      required this.horizontalMargin,
-      required this.verticalPadding,
-      required this.horizontalPadding,
-      this.isFullWidth = true,
-      this.border});
+  const CardWidget({
+    super.key,
+    required this.child,
+    required this.verticalMargin,
+    required this.horizontalMargin,
+    required this.verticalPadding,
+    required this.horizontalPadding,
+    this.isFullWidth = true,
+    this.border,
+  });
 
   final Widget child;
   final double verticalMargin;

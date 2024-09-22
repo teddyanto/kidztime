@@ -33,7 +33,55 @@ class WidgetUtil {
     return PreferredSize(
       preferredSize: const Size.fromHeight(0),
       child: AppBar(
-        backgroundColor: WidgetUtil().parseHexColor(darkColor),
+        backgroundColor: WidgetUtil().parseHexColor(primaryColor),
+      ),
+    );
+  }
+
+  Positioned getAppBarV2({
+    required String titleScreen,
+    required Function callback,
+    required BuildContext context,
+    bool hasBackButton = false,
+  }) {
+    return Positioned(
+      top: 0,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: ClipPath(
+          clipper: CurvedAppBarClipper(),
+          child: Container(
+            color: WidgetUtil().parseHexColor(primaryColor),
+            padding: const EdgeInsets.only(
+              top: 40,
+              bottom: 20,
+            ),
+            child: Row(
+              children: [
+                hasBackButton
+                    ? IconButton(
+                        onPressed: () {
+                          callback();
+                        },
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const SizedBox(
+                        width: 10,
+                      ),
+                Text(
+                  titleScreen,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -139,5 +187,63 @@ class WidgetUtil {
       "Minggu"
     ];
     return hari[indexDay - 1];
+  }
+}
+
+class CurvedAppBarClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    var path = Path();
+    path.lineTo(0.0, size.height);
+
+    var firstControlPoint = Offset(size.width / 4, size.height);
+    var firstEndPoint = Offset(size.width / 2, size.height - 30);
+    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
+        firstEndPoint.dx, firstEndPoint.dy);
+
+    var secondControlPoint = Offset(3 * size.width / 4, size.height - 70);
+    var secondEndPoint = Offset(size.width, size.height - 30);
+    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
+        secondEndPoint.dx, secondEndPoint.dy);
+
+    path.lineTo(size.width, 0.0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return false;
+  }
+}
+
+class WaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    var path = Path();
+
+    // Wave starts from top left
+    path.lineTo(0.0, 0.0);
+    path.lineTo(0.0, size.height - 50);
+
+    var firstControlPoint = Offset(size.width / 4, size.height - 100);
+    var firstEndPoint = Offset(size.width / 2, size.height - 50);
+    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
+        firstEndPoint.dx, firstEndPoint.dy);
+
+    var secondControlPoint = Offset(3 * size.width / 4, size.height);
+    var secondEndPoint = Offset(size.width, size.height - 50);
+    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
+        secondEndPoint.dx, secondEndPoint.dy);
+
+    path.lineTo(size.width, 0.0);
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return false;
   }
 }
