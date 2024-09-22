@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/batasPenggunaan.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
-import 'package:kidztime/page/widget/header_widget.dart';
 import 'package:kidztime/page/widget/radio_input_widget.dart';
 import 'package:kidztime/page/widget/text_input_widget.dart';
 import 'package:kidztime/page/widget/time_input_widget.dart';
@@ -58,133 +57,143 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
     var hasbackbutton = true;
 
     return Scaffold(
-      appBar: WidgetUtil().getAppBar(),
-      body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            HeaderWidget(
-              titleScreen: "Time Limit",
-              callback: () {
-                Get.back();
-              },
-              hasBackButton: hasbackbutton,
-            ),
-            Expanded(
-              child: Center(
-                child: SingleChildScrollView(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CardWidget(
-                      horizontalMargin: 30.0,
-                      verticalMargin: 30.0,
-                      horizontalPadding: 30.0,
-                      verticalPadding: 40.0,
+      body: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 70,
+              ),
+              Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextInputWidget(
-                            maxLength: 20,
-                            controller: namaController,
-                            title: "Nama Batasan",
-                            placeholder: "Masukkan nama batasan",
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                          TextInputWidget(
-                            maxLength: 150,
-                            controller: deskripsiController,
-                            title: "Deskripsi",
-                            placeholder: "Masukkan deskripsi",
-                            maxLines: 3,
-                            textInputAction: TextInputAction.done,
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                          TimeInputWidget(
-                            controller: bataswaktuController,
-                            title: "Batas Waktu",
-                            hint: "Tekan di sini",
-                            initialTime: bataswaktuController.text == ''
-                                ? const TimeOfDay(hour: 0, minute: 0)
-                                : TimeOfDay(
-                                    hour: int.parse(bataswaktuController.text
-                                        .split(":")[0]),
-                                    minute: int.parse(bataswaktuController.text
-                                        .split(":")[1])),
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                          TimeInputWidget(
-                            controller: toleransiController,
-                            title: "Toleransi",
-                            hint: "Tekan di sini",
-                            initialTime: toleransiController.text == ""
-                                ? const TimeOfDay(hour: 0, minute: 5)
-                                : TimeOfDay(
-                                    hour: int.parse(
-                                        toleransiController.text.split(":")[0]),
-                                    minute: int.parse(toleransiController.text
-                                        .split(":")[1])),
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                          RadioButtonWidget<bool>(
-                            title: "Status Aktif",
-                            options: const [true, false],
-                            optionLabels: const {
-                              true: 'Aktif',
-                              false: 'Tidak Aktif',
-                            },
-                            groupValue: _selectedStatus,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedStatus = value ?? true;
-                              });
-                            },
-                          ),
-                          Align(
-                              alignment: Alignment.centerRight,
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    saveTimeLimit();
-                                  },
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  splashColor: Colors.amber,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 40.0, vertical: 5.0),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          WidgetUtil().parseHexColor(darkColor),
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                    child: const Text(
-                                      "Simpan",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CardWidget(
+                        horizontalMargin: 30.0,
+                        verticalMargin: 30.0,
+                        horizontalPadding: 30.0,
+                        verticalPadding: 40.0,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextInputWidget(
+                              maxLength: 20,
+                              controller: namaController,
+                              title: "Nama Batasan",
+                              placeholder: "Masukkan nama batasan",
+                            ),
+                            const SizedBox(
+                              height: 10.0,
+                            ),
+                            TextInputWidget(
+                              maxLength: 150,
+                              controller: deskripsiController,
+                              title: "Deskripsi",
+                              placeholder: "Masukkan deskripsi",
+                              maxLines: 3,
+                              textInputAction: TextInputAction.done,
+                            ),
+                            const SizedBox(
+                              height: 10.0,
+                            ),
+                            TimeInputWidget(
+                              controller: bataswaktuController,
+                              title: "Batas Waktu",
+                              hint: "Tekan di sini",
+                              initialTime: bataswaktuController.text == ''
+                                  ? const TimeOfDay(hour: 0, minute: 0)
+                                  : TimeOfDay(
+                                      hour: int.parse(bataswaktuController.text
+                                          .split(":")[0]),
+                                      minute: int.parse(bataswaktuController
+                                          .text
+                                          .split(":")[1])),
+                            ),
+                            const SizedBox(
+                              height: 10.0,
+                            ),
+                            TimeInputWidget(
+                              controller: toleransiController,
+                              title: "Toleransi",
+                              hint: "Tekan di sini",
+                              initialTime: toleransiController.text == ""
+                                  ? const TimeOfDay(hour: 0, minute: 5)
+                                  : TimeOfDay(
+                                      hour: int.parse(toleransiController.text
+                                          .split(":")[0]),
+                                      minute: int.parse(toleransiController.text
+                                          .split(":")[1])),
+                            ),
+                            const SizedBox(
+                              height: 10.0,
+                            ),
+                            RadioButtonWidget<bool>(
+                              title: "Status Aktif",
+                              options: const [true, false],
+                              optionLabels: const {
+                                true: 'Aktif',
+                                false: 'Tidak Aktif',
+                              },
+                              groupValue: _selectedStatus,
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedStatus = value ?? true;
+                                });
+                              },
+                            ),
+                            Align(
+                                alignment: Alignment.centerRight,
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      saveTimeLimit();
+                                    },
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    splashColor: Colors.amber,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 40.0, vertical: 5.0),
+                                      decoration: BoxDecoration(
+                                        color: WidgetUtil()
+                                            .parseHexColor(darkColor),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      child: const Text(
+                                        "Simpan",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ))
-                        ],
+                                ))
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                )),
-              ),
-            )
-          ]),
+                    ],
+                  )),
+                ),
+              )
+            ],
+          ),
+          WidgetUtil().getAppBarV2(
+            titleScreen: "Time Limit",
+            callback: () {
+              Get.back();
+            },
+            context: context,
+            hasBackButton: true,
+          )
+        ],
+      ),
     );
   }
 

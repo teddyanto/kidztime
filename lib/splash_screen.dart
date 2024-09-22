@@ -27,12 +27,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
       getPengaturan(database).then((pengaturan) {
         Timer(const Duration(seconds: 3), () {
           if (pengaturan.isEmpty) {
-            Get.offAndToNamed(
-              '/setup-page',
-              arguments: {
-                'from': 'splash_screen',
-              },
-            );
+            Get.offAndToNamed('/ads-page');
           } else {
             Get.offAndToNamed('/lock-page');
           }

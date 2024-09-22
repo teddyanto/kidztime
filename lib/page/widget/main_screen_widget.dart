@@ -111,7 +111,7 @@ class DaftarMenuMainWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double spacing = 10;
-    int axisCount = 3;
+    int axisCount = 4;
     int row = (listMenuWidget.length / axisCount).ceil();
 
     double height = (width - (padding * 2)) - (spacing * (axisCount - 1));
@@ -231,7 +231,7 @@ class HeaderMainWidget extends StatelessWidget {
         paddingHorizontal,
         50,
         paddingHorizontal,
-        15,
+        40,
       ),
       color: WidgetUtil().parseHexColor(primaryColor),
       width: width,
@@ -348,12 +348,12 @@ class MenuWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(16.0),
             border: Border.all(
               color: WidgetUtil().parseHexColor(darkColor),
-              width: 3,
+              width: 2,
             ),
           ),
           child: SizedBox(
-            width: width * .22,
-            height: width * .22,
+            width: width,
+            height: width,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -363,16 +363,16 @@ class MenuWidget extends StatelessWidget {
                   width: width * .11,
                 ),
                 const SizedBox(
-                  height: 3,
+                  height: 5,
                 ),
                 FittedBox(
                   child: Text(
                     title,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.normal,
-                      fontSize: 12,
+                      fontSize: MediaQuery.of(context).size.width * .02,
                     ),
                   ),
                 ),

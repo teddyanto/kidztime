@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/batasPenggunaan.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
-import 'package:kidztime/page/widget/header_widget.dart';
 import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/widget_util.dart';
@@ -44,338 +43,352 @@ class _ListTimeLimitScreenState extends State<ListTimeLimitScreen> {
         return false;
       },
       child: Scaffold(
-          appBar: WidgetUtil().getAppBar(),
-          bottomSheet: Container(
-            width: MediaQuery.of(context).size.width,
-            color: WidgetUtil().parseHexColor(darkColor),
-            child: TextButton.icon(
-              onPressed: () async {
-                final result = await Get.toNamed("/time-limit");
-                if (result != null && result == "added") {
-                  refreshBatasPenggunaan();
-                  print(result);
-                }
-              },
-              icon: const Icon(
-                Icons.add,
+        bottomSheet: Container(
+          width: MediaQuery.of(context).size.width,
+          color: WidgetUtil().parseHexColor(darkColor),
+          child: TextButton.icon(
+            onPressed: () async {
+              final result = await Get.toNamed("/time-limit");
+              if (result != null && result == "added") {
+                refreshBatasPenggunaan();
+                print(result);
+              }
+            },
+            icon: const Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+            label: const Text(
+              "Tambah batasan baru",
+              style: TextStyle(
                 color: Colors.white,
-              ),
-              label: const Text(
-                "Tambah batasan baru",
-                style: TextStyle(
-                  color: Colors.white,
-                ),
               ),
             ),
           ),
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              HeaderWidget(
-                titleScreen: "Time Limit Saved",
-                callback: () {
-                  Get.back(
-                    result: batasanPenggunaanAktif,
-                  );
-                },
-                hasBackButton: true,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 5.0,
-                    horizontal: 10.0,
-                  ),
-                  child: Column(
-                    children: [
-                      Stack(
-                        children: [
-                          TextFormField(
-                            decoration: const InputDecoration(
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 10.0),
-                              hintText: "Pencarian", // Placeholder
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.grey,
+        ),
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                const SizedBox(
+                  height: 120,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 5.0,
+                      horizontal: 10.0,
+                    ),
+                    child: Column(
+                      children: [
+                        Stack(
+                          children: [
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: 10.0),
+                                hintText: "Pencarian", // Placeholder
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.grey,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(
+                                      10.0,
+                                    ),
+                                  ),
                                 ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(
-                                    10.0,
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.blue,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(
+                                      10.0,
+                                    ),
                                   ),
                                 ),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.blue,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(
-                                    10.0,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            textInputAction: TextInputAction.done,
-                            autocorrect: false,
-                            autofocus: false,
-                            controller: searchController,
-                            onChanged: (value) {
-                              List<Bataspenggunaan> temp = [];
+                              textInputAction: TextInputAction.done,
+                              autocorrect: false,
+                              autofocus: false,
+                              controller: searchController,
+                              onChanged: (value) {
+                                List<Bataspenggunaan> temp = [];
 
-                              if (timerSearch.isActive) {
-                                timerSearch.cancel();
-                              }
-                              print(listBatasPenggunaan);
+                                if (timerSearch.isActive) {
+                                  timerSearch.cancel();
+                                }
 
-                              timerSearch =
-                                  Timer(const Duration(milliseconds: 500), () {
-                                if (value == "") {
-                                  print("masuk sini");
-                                  temp = listBatasPenggunaan;
-                                } else {
-                                  print("masuk sini 2");
-                                  for (var i = 0;
-                                      i < listBatasPenggunaan.length;
-                                      i++) {
-                                    var item = listBatasPenggunaan[i];
-                                    print(value);
-                                    if (item.nama
-                                            .toUpperCase()
-                                            .contains(value.toUpperCase()) ||
-                                        item.deskripsi
-                                            .toUpperCase()
-                                            .contains(value.toUpperCase())) {
-                                      temp.add(item);
+                                timerSearch = Timer(
+                                    const Duration(milliseconds: 500), () {
+                                  if (value == "") {
+                                    setState(() {
+                                      resultSearch = listBatasPenggunaan;
+                                    });
+                                  } else {
+                                    for (var i = 0;
+                                        i < listBatasPenggunaan.length;
+                                        i++) {
+                                      var item = listBatasPenggunaan[i];
+                                      print(value);
+                                      if (item.nama
+                                              .toUpperCase()
+                                              .contains(value.toUpperCase()) ||
+                                          item.deskripsi
+                                              .toUpperCase()
+                                              .contains(value.toUpperCase())) {
+                                        temp.add(item);
+                                      }
                                     }
                                   }
-                                }
-                                print(temp);
-                                resultSearch = temp;
-                                setState(() {});
-                              });
-                            },
-                          ),
-                          Positioned(
-                            right: searchController.text != "" ? 0 : -100,
-                            child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  searchController.text = "";
+                                  setState(() {
+                                    resultSearch = temp;
+                                  });
                                 });
                               },
-                              icon: const Icon(Icons.cancel),
                             ),
-                          ),
-                        ],
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: 50,
-                          ),
-                          child: ListView.builder(
-                            itemCount: resultSearch.length,
-                            itemBuilder: (context, index) {
-                              var item = resultSearch[index];
-
-                              return Dismissible(
-                                key: Key(item.id.toString()),
-                                onDismissed: (direction) {
-                                  handleDeleteBatasPengguna(index, context);
+                            Positioned(
+                              right: searchController.text != "" ? 0 : -100,
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    searchController.text = "";
+                                    resultSearch = listBatasPenggunaan;
+                                  });
                                 },
-                                direction: item.statusAktif
-                                    ? DismissDirection.none
-                                    : DismissDirection.startToEnd,
-                                child: CardWidget(
-                                  verticalMargin: 10,
-                                  horizontalMargin: 0,
-                                  verticalPadding: 15,
-                                  horizontalPadding: 10,
-                                  border: Border(
-                                    top: BorderSide(
-                                      color: WidgetUtil().parseHexColor(
-                                        item.statusAktif
-                                            ? darkColor
-                                            : primaryColor,
-                                      ),
-                                      width: 4,
-                                    ),
-                                    right: BorderSide(
-                                      color: WidgetUtil().parseHexColor(
-                                        item.statusAktif
-                                            ? darkColor
-                                            : primaryColor,
-                                      ),
-                                      width: 4,
-                                    ),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              item.nama,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 3),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                5,
-                                              ),
-                                              color: WidgetUtil().parseHexColor(
-                                                item.statusAktif
-                                                    ? darkColor
-                                                    : primaryColor,
-                                              ),
-                                            ),
-                                            child: Text(
-                                              item.statusAktif
-                                                  ? "Sedang Aktif"
-                                                  : "Tidak aktif",
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                // fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      const Text("Deskripsi : "),
-                                      Text(
-                                        item.deskripsi,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.normal,
+                                icon: const Icon(Icons.cancel),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: 50,
+                              top: 10,
+                            ),
+                            child: ListView.builder(
+                              padding: EdgeInsets.zero,
+                              itemCount: resultSearch.length,
+                              itemBuilder: (context, index) {
+                                var item = resultSearch[index];
+
+                                return Dismissible(
+                                  key: Key(item.id.toString()),
+                                  onDismissed: (direction) {
+                                    handleDeleteBatasPengguna(index, context);
+                                  },
+                                  direction: item.statusAktif
+                                      ? DismissDirection.none
+                                      : DismissDirection.startToEnd,
+                                  child: CardWidget(
+                                    verticalMargin: 5,
+                                    horizontalMargin: 0,
+                                    verticalPadding: 15,
+                                    horizontalPadding: 10,
+                                    border: Border(
+                                      top: BorderSide(
+                                        color: WidgetUtil().parseHexColor(
+                                          item.statusAktif
+                                              ? darkColor
+                                              : primaryColor,
                                         ),
+                                        width: 4,
                                       ),
-                                      const SizedBox(
-                                        height: 10,
+                                      right: BorderSide(
+                                        color: WidgetUtil().parseHexColor(
+                                          item.statusAktif
+                                              ? darkColor
+                                              : primaryColor,
+                                        ),
+                                        width: 4,
                                       ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Wrap(
-                                            crossAxisAlignment:
-                                                WrapCrossAlignment.center,
-                                            spacing: 3,
-                                            children: [
-                                              const Icon(Icons.alarm),
-                                              Text(
-                                                item.batasWaktu,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                item.nama,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                              const SizedBox(
-                                                width: 5,
+                                            ),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 10,
+                                                vertical: 3,
                                               ),
-                                              const Icon(Icons.alarm_add),
-                                              Text(
-                                                item.batasToleransi,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  5,
+                                                ),
+                                                color:
+                                                    WidgetUtil().parseHexColor(
+                                                  item.statusAktif
+                                                      ? darkColor
+                                                      : primaryColor,
                                                 ),
                                               ),
-                                            ],
+                                              child: Text(
+                                                item.statusAktif
+                                                    ? "Sedang Aktif"
+                                                    : "Tidak aktif",
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  // fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        const Text("Deskripsi : "),
+                                        Text(
+                                          item.deskripsi,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.normal,
                                           ),
-                                          Wrap(
-                                            children: [
-                                              if (!item.statusAktif)
-                                                IconButton.filledTonal(
-                                                  color: Colors.red,
-                                                  onPressed: () {
-                                                    handleDeleteBatasPengguna(
-                                                        index, context);
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.delete,
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Wrap(
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.center,
+                                              spacing: 3,
+                                              children: [
+                                                const Icon(Icons.alarm),
+                                                Text(
+                                                  item.batasWaktu,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
-                                              if (!item.statusAktif)
-                                                IconButton.filledTonal(
-                                                  color: WidgetUtil()
-                                                      .parseHexColor(darkColor),
-                                                  onPressed: () async {
-                                                    final result =
-                                                        await Get.toNamed(
-                                                      "/time-limit",
-                                                      arguments: item,
-                                                    );
-                                                    refreshBatasPenggunaan();
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.edit,
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                const Icon(Icons.alarm_add),
+                                                Text(
+                                                  item.batasToleransi,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
-                                              if (!item.statusAktif)
-                                                IconButton.filledTonal(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    horizontal: 20,
-                                                  ),
-                                                  onPressed: () {
-                                                    handleActivationBatasWaktu(
-                                                        item, context);
-                                                  },
-                                                  icon: const Text(
-                                                    "Aktifkan",
-                                                  ),
-                                                )
-                                              else
-                                                IconButton.filledTonal(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    horizontal: 20,
-                                                  ),
-                                                  onPressed: () {
-                                                    updateStatusAktifBatasPenggunaan(
-                                                            dbKidztime, false)
-                                                        .then((e) {
-                                                      refreshBatasPenggunaan();
-                                                    });
-                                                  },
-                                                  icon: const Text(
-                                                    "Nonaktifkan",
-                                                    style: TextStyle(
-                                                      color: Colors.red,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                              ],
+                                            ),
+                                            Wrap(
+                                              children: [
+                                                if (!item.statusAktif)
+                                                  IconButton.filledTonal(
+                                                    color: Colors.red,
+                                                    onPressed: () {
+                                                      handleDeleteBatasPengguna(
+                                                          index, context);
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.delete,
                                                     ),
                                                   ),
-                                                ),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    ],
+                                                if (!item.statusAktif)
+                                                  IconButton.filledTonal(
+                                                    color: WidgetUtil()
+                                                        .parseHexColor(
+                                                            darkColor),
+                                                    onPressed: () async {
+                                                      final result =
+                                                          await Get.toNamed(
+                                                        "/time-limit",
+                                                        arguments: item,
+                                                      );
+                                                      refreshBatasPenggunaan();
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.edit,
+                                                    ),
+                                                  ),
+                                                if (!item.statusAktif)
+                                                  IconButton.filledTonal(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                      horizontal: 20,
+                                                    ),
+                                                    onPressed: () {
+                                                      handleActivationBatasWaktu(
+                                                          item, context);
+                                                    },
+                                                    icon: const Text(
+                                                      "Aktifkan",
+                                                    ),
+                                                  )
+                                                else
+                                                  IconButton.filledTonal(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                      horizontal: 20,
+                                                    ),
+                                                    onPressed: () {
+                                                      updateStatusAktifBatasPenggunaan(
+                                                              dbKidztime, false)
+                                                          .then((e) {
+                                                        refreshBatasPenggunaan();
+                                                      });
+                                                    },
+                                                    icon: const Text(
+                                                      "Nonaktifkan",
+                                                      style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              )
-            ],
-          )),
+              ],
+            ),
+            WidgetUtil().getAppBarV2(
+              titleScreen: "Time Limit Saved",
+              callback: () {
+                Get.back(
+                  result: batasanPenggunaanAktif,
+                );
+              },
+              context: context,
+              hasBackButton: true,
+            )
+          ],
+        ),
+      ),
     );
   }
 

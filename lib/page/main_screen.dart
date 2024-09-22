@@ -6,7 +6,6 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/aktivitas.dart';
 import 'package:kidztime/model/batasPenggunaan.dart';
-import 'package:kidztime/model/jadwalPenggunaan.dart';
 import 'package:kidztime/model/pengaturan.dart';
 import 'package:kidztime/page/widget/main_screen_widget.dart';
 import 'package:kidztime/utils/background_service.dart';
@@ -148,15 +147,12 @@ class _MainMenuPageState extends State<MainMenuPage> {
             cancelButtonText: "Batal",
           );
         },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
+        child: Stack(
           children: [
-            HeaderMainWidget(
-                paddingHorizontal: paddingHorizontal,
-                width: width,
-                currentDate: currentDate),
-            Expanded(
+            Container(
+              margin: const EdgeInsets.only(
+                top: 160,
+              ),
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: padding,
@@ -165,6 +161,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(
+                        height: 40,
+                      ),
                       GreetingMainWidget(nama: nama),
                       const SubTitleWidget(
                           teks: "(5) Aktivitas Penggunaan Terakhir"),
@@ -179,7 +178,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                           MenuWidget(
                             width: MediaQuery.of(context).size.width,
                             icon: iconMenu1,
-                            title: "Atur Batas Waktu",
+                            title: "Batas Waktu",
                             callBack: () async {
                               final result =
                                   await Get.toNamed("/list-time-limit");
@@ -206,7 +205,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                           MenuWidget(
                             width: width,
                             icon: iconMenu2,
-                            title: "Atur Jadwal Penggunaan",
+                            title: "Jadwal Penggunaan",
                             callBack: () async {
                               // Get.toNamed('/schedule-page');
                               // Get.toNamed('/list-schedule');
@@ -217,7 +216,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                           MenuWidget(
                             width: width,
                             icon: iconMenu3,
-                            title: "Lihat Aktivitas Gawai",
+                            title: "Aktivitas Gawai",
                             callBack: () {
                               Get.toNamed('/activity-page');
                             },
@@ -228,6 +227,22 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             title: "Pengaturan Aplikasi",
                             callBack: () {
                               Get.toNamed("/setup-page");
+                            },
+                          ),
+                          MenuWidget(
+                            width: width,
+                            icon: iconMenu5,
+                            title: "Cara Penggunaan",
+                            callBack: () {
+                              Get.toNamed("/how-to-page");
+                            },
+                          ),
+                          MenuWidget(
+                            width: width,
+                            icon: iconMenu6,
+                            title: "Tentang aplikasi",
+                            callBack: () {
+                              Get.toNamed("/about-page");
                             },
                           ),
                         ],
@@ -371,6 +386,16 @@ class _MainMenuPageState extends State<MainMenuPage> {
                     ],
                   ),
                 ),
+              ),
+            ),
+            Positioned(
+              top: 0,
+              child: ClipPath(
+                clipper: CurvedAppBarClipper(),
+                child: HeaderMainWidget(
+                    paddingHorizontal: paddingHorizontal,
+                    width: width,
+                    currentDate: currentDate),
               ),
             ),
           ],
