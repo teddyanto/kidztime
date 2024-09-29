@@ -24,10 +24,19 @@ class _ListTimeLimitScreenState extends State<ListTimeLimitScreen> {
   late List<Bataspenggunaan> resultSearch = [];
   late Timer timerSearch = Timer(Duration.zero, () {});
   late Bataspenggunaan? batasanPenggunaanAktif;
+  late bool batasWaktuIsRunning;
 
   @override
   void initState() {
     super.initState();
+
+    if (Get.arguments != null) {
+      final args = Get.arguments as Map<String, dynamic>;
+
+      setState(() {
+        batasWaktuIsRunning = args['batasWaktuIsRunning'];
+      });
+    }
 
     refreshBatasPenggunaan();
   }
@@ -176,9 +185,10 @@ class _ListTimeLimitScreenState extends State<ListTimeLimitScreen> {
                                   onDismissed: (direction) {
                                     handleDeleteBatasPengguna(index, context);
                                   },
-                                  direction: item.statusAktif
-                                      ? DismissDirection.none
-                                      : DismissDirection.startToEnd,
+                                  direction:
+                                      (item.statusAktif || batasWaktuIsRunning)
+                                          ? DismissDirection.none
+                                          : DismissDirection.startToEnd,
                                   child: CardWidget(
                                     verticalMargin: 5,
                                     horizontalMargin: 0,
@@ -295,8 +305,12 @@ class _ListTimeLimitScreenState extends State<ListTimeLimitScreen> {
                                                   IconButton.filledTonal(
                                                     color: Colors.red,
                                                     onPressed: () {
-                                                      handleDeleteBatasPengguna(
-                                                          index, context);
+                                                      if (!batasWaktuIsRunning) {
+                                                        handleDeleteBatasPengguna(
+                                                            index, context);
+                                                      } else {
+                                                        infoBatasWaktuIsRunning();
+                                                      }
                                                     },
                                                     icon: const Icon(
                                                       Icons.delete,
@@ -308,12 +322,15 @@ class _ListTimeLimitScreenState extends State<ListTimeLimitScreen> {
                                                         .parseHexColor(
                                                             darkColor),
                                                     onPressed: () async {
-                                                      final result =
-                                                          await Get.toNamed(
-                                                        "/time-limit",
-                                                        arguments: item,
-                                                      );
-                                                      refreshBatasPenggunaan();
+                                                      if (!batasWaktuIsRunning) {
+                                                        await Get.toNamed(
+                                                          "/time-limit",
+                                                          arguments: item,
+                                                        );
+                                                        refreshBatasPenggunaan();
+                                                      } else {
+                                                        infoBatasWaktuIsRunning();
+                                                      }
                                                     },
                                                     icon: const Icon(
                                                       Icons.edit,
@@ -326,8 +343,12 @@ class _ListTimeLimitScreenState extends State<ListTimeLimitScreen> {
                                                       horizontal: 20,
                                                     ),
                                                     onPressed: () {
-                                                      handleActivationBatasWaktu(
-                                                          item, context);
+                                                      if (!batasWaktuIsRunning) {
+                                                        handleActivationBatasWaktu(
+                                                            item, context);
+                                                      } else {
+                                                        infoBatasWaktuIsRunning();
+                                                      }
                                                     },
                                                     icon: const Text(
                                                       "Aktifkan",
@@ -340,11 +361,16 @@ class _ListTimeLimitScreenState extends State<ListTimeLimitScreen> {
                                                       horizontal: 20,
                                                     ),
                                                     onPressed: () {
-                                                      updateStatusAktifBatasPenggunaan(
-                                                              dbKidztime, false)
-                                                          .then((e) {
-                                                        refreshBatasPenggunaan();
-                                                      });
+                                                      if (!batasWaktuIsRunning) {
+                                                        updateStatusAktifBatasPenggunaan(
+                                                                dbKidztime,
+                                                                false)
+                                                            .then((e) {
+                                                          refreshBatasPenggunaan();
+                                                        });
+                                                      } else {
+                                                        infoBatasWaktuIsRunning();
+                                                      }
                                                     },
                                                     icon: const Text(
                                                       "Nonaktifkan",
@@ -455,5 +481,17 @@ class _ListTimeLimitScreenState extends State<ListTimeLimitScreen> {
         print("batasanPenggunaanAktif ${batasanPenggunaanAktif?.nama}");
       });
     });
+  }
+
+  void infoBatasWaktuIsRunning() {
+    var snackBar = const SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: Text(
+        'Aktifitas tidak bisa dilakukan sekarang, batas waktu sedang berjalan !',
+      ),
+      duration: Duration(seconds: 3),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

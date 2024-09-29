@@ -183,26 +183,33 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             icon: iconMenu1,
                             title: "Batas Waktu",
                             callBack: () async {
-                              final result =
-                                  await Get.toNamed("/list-time-limit");
-                              setState(() {
-                                _bataspenggunaan = result;
-                                if (_bataspenggunaan != null) {
-                                  _batasWaktuIsRunning = false;
+                              final result = await Get.toNamed(
+                                "/list-time-limit",
+                                arguments: {
+                                  'batasWaktuIsRunning': _batasWaktuIsRunning,
+                                },
+                              );
 
-                                  int hours = int.parse(_bataspenggunaan!
-                                      .batasWaktu
-                                      .split(":")[0]);
-                                  int minutes = int.parse(_bataspenggunaan!
-                                      .batasWaktu
-                                      .split(":")[1]);
+                              if (_batasWaktuIsRunning == false) {
+                                setState(() {
+                                  _bataspenggunaan = result;
+                                  if (_bataspenggunaan != null) {
+                                    _batasWaktuIsRunning = false;
 
-                                  setState(() {
-                                    _remainingTime =
-                                        (hours * 3600) + (minutes * 60);
-                                  });
-                                }
-                              });
+                                    int hours = int.parse(_bataspenggunaan!
+                                        .batasWaktu
+                                        .split(":")[0]);
+                                    int minutes = int.parse(_bataspenggunaan!
+                                        .batasWaktu
+                                        .split(":")[1]);
+
+                                    setState(() {
+                                      _remainingTime =
+                                          (hours * 3600) + (minutes * 60);
+                                    });
+                                  }
+                                });
+                              }
                             },
                           ),
                           MenuWidget(
