@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/jadwalPenggunaan.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
-import 'package:kidztime/page/widget/radio_input_widget.dart';
 import 'package:kidztime/page/widget/time_input_widget.dart';
 import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
@@ -22,10 +21,25 @@ class ScheduleScreen extends StatefulWidget {
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
   final ScheduleEntry _schedule = ScheduleEntry();
+  late Jadwalpenggunaan _jadwalpenggunaan;
+  late int? id;
 
   @override
   void initState() {
     super.initState();
+
+    if (Get.arguments != null) {
+      final args = Get.arguments;
+      _jadwalpenggunaan = args;
+
+      id = _jadwalpenggunaan.id;
+      _schedule.waktuMulaiController.text = _jadwalpenggunaan.waktuMulai;
+      _schedule.waktuAkhirController.text = _jadwalpenggunaan.waktuAkhir;
+
+      for (var day in _jadwalpenggunaan.hari.split(",")) {
+        _schedule.selectedDays[day] = true;
+      }
+    }
   }
 
   @override
@@ -106,17 +120,17 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             initialTime: _schedule.getWaktuAkhir(),
           ),
           const SizedBox(height: 10.0),
-          RadioButtonWidget<bool>(
-            title: "Status Aktif",
-            options: const [true, false],
-            optionLabels: const {true: 'Aktif', false: 'Tidak Aktif'},
-            groupValue: _schedule.selectedStatus,
-            onChanged: (value) {
-              setState(() {
-                _schedule.selectedStatus = value ?? true;
-              });
-            },
-          ),
+          // RadioButtonWidget<bool>(
+          //   title: "Status Aktif",
+          //   options: const [true, false],
+          //   optionLabels: const {true: 'Aktif', false: 'Tidak Aktif'},
+          //   groupValue: _schedule.selectedStatus,
+          //   onChanged: (value) {
+          //     setState(() {
+          //       _schedule.selectedStatus = value ?? true;
+          //     });
+          //   },
+          // ),
           Align(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
@@ -145,40 +159,36 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   void _saveSchedule() async {
     Database db = await widget.dbKidztime;
 
+    List<String> days = [];
     if (_schedule.isValid()) {
-      Set<String> processedDays = {};
-
       for (var day in _schedule.selectedDays.keys) {
-        if (_schedule.selectedDays[day] == true &&
-            !processedDays.contains(day)) {
-          Jadwalpenggunaan jadwalpenggunaan = Jadwalpenggunaan(
-            hari: day,
-            waktuMulai: _schedule.waktuMulaiController.text,
-            waktuAkhir: _schedule.waktuAkhirController.text,
-            statusAktif: _schedule.selectedStatus,
-          );
-
-          var existingJadwal = await getJadwalByHari(widget.dbKidztime, day);
-
-          if (existingJadwal != null) {
-            jadwalpenggunaan.id = existingJadwal.id;
-            await updateJadwalPenggunaan(widget.dbKidztime, jadwalpenggunaan);
-            print('Data updated in database: $jadwalpenggunaan');
-          } else {
-            int newId = await insertJadwalPenggunaan(
-                widget.dbKidztime, jadwalpenggunaan);
-            jadwalpenggunaan.id = newId;
-            print('New data added to database: $jadwalpenggunaan');
-          }
-
-          processedDays.add(day);
-
-          print('Schedule for $day:');
-          print('  Waktu Mulai: ${_schedule.waktuMulaiController.text}');
-          print('  Waktu Akhir: ${_schedule.waktuAkhirController.text}');
-          print('  Status Aktif: ${_schedule.selectedStatus}');
+        if (_schedule.selectedDays[day] == true) {
+          days.add(day);
         }
       }
+
+      Jadwalpenggunaan jadwalpenggunaan = Jadwalpenggunaan(
+        hari: days.join(","),
+        waktuMulai: _schedule.waktuMulaiController.text,
+        waktuAkhir: _schedule.waktuAkhirController.text,
+        statusAktif: false,
+      );
+
+      if (id == null) {
+        insertJadwalPenggunaan(widget.dbKidztime, jadwalpenggunaan);
+
+        print('New data added to database: $jadwalpenggunaan');
+      } else {
+        jadwalpenggunaan.id = id;
+        updateJadwalPenggunaan(widget.dbKidztime, jadwalpenggunaan);
+
+        print('Data Update to database: $jadwalpenggunaan');
+      }
+
+      print('Schedule for $days');
+      print('  Waktu Mulai: ${_schedule.waktuMulaiController.text}');
+      print('  Waktu Akhir: ${_schedule.waktuAkhirController.text}');
+      print('  Status Aktif: ${_schedule.selectedStatus}');
 
       WidgetUtil().customeDialog(
         context: context,

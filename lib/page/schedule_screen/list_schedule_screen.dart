@@ -47,7 +47,7 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
               child: Column(
                 children: [
                   const SizedBox(
-                    height: 100,
+                    height: 120,
                   ),
                   Stack(
                     children: [
@@ -106,6 +106,7 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                           onPressed: () {
                             setState(() {
                               searchController.text = "";
+                              resultSearch = listJadwal;
                             });
                           },
                           icon: const Icon(Icons.cancel),
@@ -115,15 +116,19 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                   ),
                   Expanded(
                     child: ListView.builder(
-                      padding: EdgeInsets.zero,
-                      itemCount: groupJadwal(resultSearch).length,
+                      padding: const EdgeInsets.only(
+                        bottom: 30,
+                      ),
+                      itemCount: resultSearch.length,
                       itemBuilder: (context, index) {
-                        var entry =
-                            groupJadwal(resultSearch).entries.elementAt(index);
-                        var items = entry.value;
+                        // var entry =
+                        //     groupJadwal(resultSearch).entries.elementAt(index);
+                        // var items = entry.value;
 
-                        // Use the first item for display purposes
-                        var item = items.first;
+                        // // Use the first item for display purposes
+                        // var item = items.first;
+                        var item = resultSearch[index];
+                        var days = item.hari.split(",");
 
                         return Dismissible(
                           key: Key(item.id.toString()),
@@ -198,45 +203,7 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                                   ],
                                 ),
                                 const SizedBox(height: 10),
-                                Wrap(
-                                  spacing: 3.0,
-                                  runSpacing: 3.0,
-                                  children: List.generate(7, (i) {
-                                    String day = [
-                                      'Senin',
-                                      'Selasa',
-                                      'Rabu',
-                                      'Kamis',
-                                      'Jumat',
-                                      'Sabtu',
-                                      'Minggu'
-                                    ][i];
-                                    bool hasSchedule = items.any((e) =>
-                                        e.hari.toUpperCase() ==
-                                        day.toUpperCase());
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5),
-                                      margin: const EdgeInsets.only(right: 4),
-                                      decoration: BoxDecoration(
-                                        color: hasSchedule
-                                            ? WidgetUtil()
-                                                .parseHexColor(darkColor)
-                                            : Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: Text(
-                                        day,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: hasSchedule
-                                              ? Colors.white
-                                              : Colors.black54,
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                ),
+                                getDays(days),
                                 const SizedBox(height: 10),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -333,6 +300,44 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
     );
   }
 
+  Wrap getDays(days) {
+    List<String> day = [
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+      'Minggu'
+    ];
+    return Wrap(
+      spacing: 3.0,
+      runSpacing: 3.0,
+      children: List.generate(7, (i) {
+        bool hasSchedule =
+            days.any((e) => e.toString().toUpperCase() == day[i].toUpperCase());
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          margin: const EdgeInsets.only(right: 4),
+          decoration: BoxDecoration(
+            color: hasSchedule
+                ? WidgetUtil().parseHexColor(darkColor)
+                : Colors.grey[300],
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Text(
+            day[i],
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: hasSchedule ? Colors.white : Colors.black54,
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
   Map<String, List<Jadwalpenggunaan>> groupJadwal(
       List<Jadwalpenggunaan> jadwals) {
     Map<String, List<Jadwalpenggunaan>> groupedJadwals = {};
@@ -357,7 +362,8 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
       waktuAkhir: item.waktuAkhir,
       statusAktif: true,
     );
-    updateStatusAktifJadwal(dbKidztime, true).then((e) {
+
+    updateJadwalPenggunaan(dbKidztime, updateItem).then((e) {
       refreshJadwal();
     });
   }
