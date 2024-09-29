@@ -123,15 +123,12 @@ class _ListTimeLimitScreenState extends State<ListTimeLimitScreen> {
                                 timerSearch = Timer(
                                     const Duration(milliseconds: 500), () {
                                   if (value == "") {
-                                    setState(() {
-                                      resultSearch = listBatasPenggunaan;
-                                    });
+                                    temp = listBatasPenggunaan;
                                   } else {
                                     for (var i = 0;
                                         i < listBatasPenggunaan.length;
                                         i++) {
                                       var item = listBatasPenggunaan[i];
-                                      print(value);
                                       if (item.nama
                                               .toUpperCase()
                                               .contains(value.toUpperCase()) ||

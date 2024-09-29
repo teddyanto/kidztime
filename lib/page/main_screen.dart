@@ -9,6 +9,7 @@ import 'package:kidztime/model/batasPenggunaan.dart';
 import 'package:kidztime/model/pengaturan.dart';
 import 'package:kidztime/page/widget/main_screen_widget.dart';
 import 'package:kidztime/utils/background_service.dart';
+import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/png_assets.dart';
 import 'package:kidztime/utils/preferences.dart';
@@ -34,6 +35,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
   bool _batasWaktuIsRunning = false;
   int _remainingTime = 0;
   Timer _timer = Timer(const Duration(seconds: 0), () {});
+
+  Timer _doubleTapTimer = Timer(const Duration(seconds: 0), () {});
 
   @override
   void initState() {
@@ -245,144 +248,23 @@ class _MainMenuPageState extends State<MainMenuPage> {
                               Get.toNamed("/about-page");
                             },
                           ),
-                        ],
-                      ),
-                      Wrap(
-                        children: [
-                          if (_batasWaktuIsRunning)
-                            Wrap(
-                              children: [
-                                IconButton(
-                                  onPressed: () async {
-                                    buttonStartStopHandle(
-                                      context: context,
-                                    );
-                                  },
-                                  icon: const Row(
-                                    children: [
-                                      FittedBox(
-                                          child: Text("Hentikan batas waktu")),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Icon(
-                                        Icons.stop_circle,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            )
-                          else
-                            IconButton(
-                              onPressed: () async {
-                                if (_bataspenggunaan != null) {
-                                  String batasWaktu =
-                                      _bataspenggunaan!.batasWaktu;
-
-                                  int hours =
-                                      int.parse(batasWaktu.split(":")[0]);
-                                  int minutes =
-                                      int.parse(batasWaktu.split(":")[1]);
-
-                                  startTimer();
-                                  buttonStartStopHandle(
-                                    context: context,
-                                    hours: hours,
-                                    minutes: minutes,
-                                    seconds: 0,
-                                  );
-                                } else {
-                                  var snackBar = const SnackBar(
-                                    behavior: SnackBarBehavior.floating,
-                                    content: Text(
-                                      'Mohon atur batas waktu terlebih dahulu !',
-                                    ),
-                                    duration: Duration(seconds: 3),
-                                  );
-
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(snackBar);
-
-                                  snackBar = const SnackBar(
-                                    behavior: SnackBarBehavior.floating,
-                                    content: Text(
-                                      'Silahkan masuk ke menu `Atur Batas Waktu`',
-                                    ),
-                                    duration: Duration(seconds: 4),
-                                  );
-
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(snackBar);
-                                }
-                              },
-                              icon: Row(
-                                children: [
-                                  FittedBox(
-                                    child: Text(
-                                      "Mulai batas waktu",
-                                      style: TextStyle(
-                                        color: _bataspenggunaan == null
-                                            ? Colors.grey
-                                            : Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  const Icon(
-                                    Icons.play_circle,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          IconButton(
-                            onPressed: () async {
-                              Get.toNamed("/times-up");
-                            },
-                            icon: const Row(
-                              children: [
-                                FittedBox(child: Text("Kunci device manual")),
-                                Icon(Icons.lock)
-                              ],
-                            ),
-                          ),
+                          // MenuWidget(
+                          //   width: width,
+                          //   icon: "",
+                          //   title: "Advertisment",
+                          //   callBack: () {
+                          //     Get.toNamed("/ads-page");
+                          //   },
+                          // ),
                         ],
                       ),
                       BatasWaktuBarWidget(
                         aktif: _batasWaktuIsRunning,
                         remainingTime: _remainingTime,
                       ),
-                      // StreamBuilder(
-                      //     stream: FlutterBackgroundService().on('update'),
-                      //     builder: (context, snapshot) {
-                      //       String remainingTimeFormatted = "00:00:00";
-                      //       bool aktif = false;
-                      //       if (snapshot.hasData) {
-                      //         final data = snapshot.data!;
-
-                      //         int remainingTime = data['remaining_time'];
-                      //         aktif = data['aktif'];
-
-                      //         print(aktif.toString());
-
-                      //         if (remainingTime == 0) {}
-
-                      //         int hours = (remainingTime / 3600).floor();
-                      //         int minutes =
-                      //             ((remainingTime % 3600) / 60).floor();
-                      //         int seconds = (remainingTime % 60).floor();
-
-                      //         remainingTimeFormatted = [
-                      //           hours.toString().padLeft(2, "0"),
-                      //           minutes.toString().padLeft(2, "0"),
-                      //           seconds.toString().padLeft(2, "0"),
-                      //         ].join(":");
-                      //       }
-
-                      //       return
-                      //     }),
+                      const SizedBox(
+                        height: 100,
+                      ),
                     ],
                   ),
                 ),
@@ -401,6 +283,124 @@ class _MainMenuPageState extends State<MainMenuPage> {
           ],
         ),
       ),
+      floatingActionButtonLocation: _batasWaktuIsRunning
+          ? FloatingActionButtonLocation.miniStartDocked
+          : FloatingActionButtonLocation.miniEndDocked,
+      floatingActionButton: _batasWaktuIsRunning
+          ? TextButton.icon(
+              onPressed: () async {
+                if (!_doubleTapTimer.isActive) {
+                  _doubleTapTimer = Timer(const Duration(seconds: 3), () {});
+                  var snackBar = const SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    content: Text(
+                      'Tekan sekali lagi untuk menghentikan !',
+                    ),
+                    duration: Duration(seconds: 3),
+                  );
+
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  return;
+                }
+                buttonStartStopHandle(
+                  context: context,
+                );
+              },
+              style: const ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(
+                  Colors.red,
+                ),
+                side: WidgetStatePropertyAll(
+                  BorderSide(
+                    color: Colors.black,
+                    width: 1,
+                  ),
+                ),
+              ),
+              icon: const Icon(
+                Icons.stop_circle,
+                color: Colors.white,
+              ),
+              label: const Text(
+                "Hentikan batas waktu",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            )
+          : TextButton.icon(
+              onPressed: () async {
+                if (_bataspenggunaan != null) {
+                  if (!_doubleTapTimer.isActive) {
+                    _doubleTapTimer = Timer(const Duration(seconds: 3), () {});
+                    var snackBar = const SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: Text(
+                        'Tekan sekali lagi untuk memulai !',
+                      ),
+                      duration: Duration(seconds: 3),
+                    );
+
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    return;
+                  }
+
+                  String batasWaktu = _bataspenggunaan!.batasWaktu;
+
+                  int hours = int.parse(batasWaktu.split(":")[0]);
+                  int minutes = int.parse(batasWaktu.split(":")[1]);
+
+                  startTimer();
+                  buttonStartStopHandle(
+                    context: context,
+                    hours: hours,
+                    minutes: minutes,
+                    seconds: 0,
+                  );
+                } else {
+                  var snackBar = const SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    content: Text(
+                      'Mohon atur batas waktu terlebih dahulu !',
+                    ),
+                    duration: Duration(seconds: 3),
+                  );
+
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+                  // snackBar = const SnackBar(
+                  //   behavior: SnackBarBehavior.floating,
+                  //   content: Text(
+                  //     'Silahkan masuk ke menu `Batas Waktu`',
+                  //   ),
+                  //   duration: Duration(seconds: 4),
+                  // );
+
+                  // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+              },
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(
+                  WidgetUtil().parseHexColor(primaryColor),
+                ),
+                side: const WidgetStatePropertyAll(
+                  BorderSide(
+                    color: Colors.black,
+                    width: 1,
+                  ),
+                ),
+              ),
+              icon: const Icon(
+                Icons.play_arrow,
+                color: Colors.white,
+              ),
+              label: const Text(
+                "Mulai batas waktu",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
     );
   }
 

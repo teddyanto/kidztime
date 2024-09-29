@@ -1,11 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/jadwalPenggunaan.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
-import 'package:kidztime/page/widget/header_widget.dart';
-import 'package:kidztime/page/widget/time_input_widget.dart';
 import 'package:kidztime/page/widget/radio_input_widget.dart';
+import 'package:kidztime/page/widget/time_input_widget.dart';
 import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/widget_util.dart';
@@ -21,7 +21,7 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
-  ScheduleEntry _schedule = ScheduleEntry();
+  final ScheduleEntry _schedule = ScheduleEntry();
 
   @override
   void initState() {
@@ -31,60 +31,39 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     var hasbackbutton = true;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: WidgetUtil().getAppBar(),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
+      body: Stack(
         children: [
-          HeaderWidget(
-            titleScreen: "Set Schedule",
-            callback: () {
-              Get.back();
-            },
-            hasBackButton: hasbackbutton,
-          ),
-          Expanded(
+          SizedBox(
+            height: height,
+            width: width,
             child: Center(
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Please set a gadget usage schedule"),
+                    const SizedBox(
+                      height: 100,
+                    ),
+                    const Text("Masukkan batas penggunaan terjadwal"),
                     _buildScheduleForm(), // Only one schedule form now
                     const SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: InkWell(
-                        onTap: () {
-                          _saveSchedule(); // Save the single schedule
-                        },
-                        borderRadius: BorderRadius.circular(10.0),
-                        splashColor: Colors.amber,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 40.0, vertical: 5.0),
-                          decoration: BoxDecoration(
-                            color: WidgetUtil().parseHexColor(darkColor),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          child: const Text(
-                            "Simpan Jadwal",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
             ),
           ),
+          WidgetUtil().getAppBarV2(
+            titleScreen: "Set Schedule",
+            callback: () {
+              Get.back();
+            },
+            context: context,
+            hasBackButton: true,
+          )
         ],
       ),
     );
@@ -94,7 +73,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     return CardWidget(
       verticalMargin: 30.0,
       horizontalMargin: 30.0,
-      verticalPadding: 40.0,
+      verticalPadding: 20.0,
       horizontalPadding: 30.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,6 +116,26 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 _schedule.selectedStatus = value ?? true;
               });
             },
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton(
+              onPressed: () {
+                _saveSchedule(); // Save the single schedule
+              },
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(
+                  WidgetUtil().parseHexColor(darkColor),
+                ),
+              ),
+              child: const Text(
+                "Simpan Jadwal",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ),
         ],
       ),

@@ -99,6 +99,7 @@ class WidgetUtil {
       barrierDismissible: false, // user must tap button!
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: Text(
             title,
             style: const TextStyle(

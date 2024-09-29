@@ -64,7 +64,7 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(
-                height: 70,
+                height: 100,
               ),
               Expanded(
                 child: Center(
@@ -72,11 +72,12 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
                       child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const Text("Masukkan data batas penggunaan"),
                       CardWidget(
                         horizontalMargin: 30.0,
                         verticalMargin: 30.0,
                         horizontalPadding: 30.0,
-                        verticalPadding: 40.0,
+                        verticalPadding: 20.0,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -146,35 +147,25 @@ class _TimeLimitScreenState extends State<TimeLimitScreen> {
                               },
                             ),
                             Align(
-                                alignment: Alignment.centerRight,
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () {
-                                      saveTimeLimit();
-                                    },
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    splashColor: Colors.amber,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 40.0, vertical: 5.0),
-                                      decoration: BoxDecoration(
-                                        color: WidgetUtil()
-                                            .parseHexColor(darkColor),
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      child: const Text(
-                                        "Simpan",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
+                              alignment: Alignment.centerRight,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  saveTimeLimit();
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStatePropertyAll(
+                                    WidgetUtil().parseHexColor(darkColor),
                                   ),
-                                ))
+                                ),
+                                child: const Text(
+                                  "Simpan",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),

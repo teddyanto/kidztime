@@ -1,8 +1,8 @@
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:kidztime/activity_screen.dart';
 import 'package:kidztime/page/about_screen.dart';
+import 'package:kidztime/page/activity_screen.dart';
 import 'package:kidztime/page/ads_screen.dart';
+import 'package:kidztime/page/guidance_screen.dart';
 import 'package:kidztime/page/lock_screen.dart';
 import 'package:kidztime/page/main_screen.dart';
 import 'package:kidztime/page/schedule_screen/list_schedule_screen.dart';
@@ -64,17 +64,17 @@ class Routes {
       ),
       GetPage(
         name: '/activity-page',
-        page: () => ActivityHistoryScreen(),
+        page: () => const ActivityHistoryScreen(),
         transition: Transition.rightToLeft,
       ),
       GetPage(
         name: '/ads-page',
-        page: () => const AdsPage(),
+        page: () => const AdsScreen(),
         transition: Transition.rightToLeft,
       ),
       GetPage(
         name: '/how-to-page',
-        page: () => const Placeholder(),
+        page: () => const GuidanceScreen(),
         transition: Transition.rightToLeft,
       ),
       GetPage(
