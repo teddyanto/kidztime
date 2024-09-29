@@ -1,9 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/jadwalPenggunaan.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
-import 'package:kidztime/page/widget/header_widget.dart';
 import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/widget_util.dart';
@@ -32,41 +32,23 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      appBar: WidgetUtil().getAppBar(),
-      bottomSheet: Container(
-        width: MediaQuery.of(context).size.width,
-        color: WidgetUtil().parseHexColor(darkColor),
-        child: TextButton.icon(
-          onPressed: () async {
-            final result = await Get.toNamed("/schedule-page");
-            if (result != null && result == "added") {
-              refreshJadwal();
-            }
-          },
-          icon: const Icon(Icons.add, color: Colors.white),
-          label: const Text(
-            "Tambah jadwal baru",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Stack(
         children: [
-          HeaderWidget(
-            titleScreen: "Jadwal Tersimpan",
-            callback: () {
-              Get.back(result: jadwalAktif);
-            },
-            hasBackButton: true,
-          ),
-          Expanded(
+          SizedBox(
+            height: height,
+            width: width,
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
               child: Column(
                 children: [
+                  const SizedBox(
+                    height: 100,
+                  ),
                   Stack(
                     children: [
                       TextFormField(
@@ -111,8 +93,10 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                                 }
                               }
                             }
-                            resultSearch = temp;
-                            setState(() {});
+
+                            setState(() {
+                              resultSearch = temp;
+                            });
                           });
                         },
                       ),
@@ -131,6 +115,7 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                   ),
                   Expanded(
                     child: ListView.builder(
+                      padding: EdgeInsets.zero,
                       itemCount: groupJadwal(resultSearch).length,
                       itemBuilder: (context, index) {
                         var entry =
@@ -207,12 +192,15 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                                     const SizedBox(width: 5),
                                     Text(
                                       "Mulai: ${item.waktuMulai} - Akhir: ${item.waktuAkhir}",
-                                      style: TextStyle(color: Colors.black87),
+                                      style: const TextStyle(
+                                          color: Colors.black87),
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 10),
                                 Wrap(
+                                  spacing: 3.0,
+                                  runSpacing: 3.0,
                                   children: List.generate(7, (i) {
                                     String day = [
                                       'Senin',
@@ -232,7 +220,8 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                                       margin: const EdgeInsets.only(right: 4),
                                       decoration: BoxDecoration(
                                         color: hasSchedule
-                                            ? Colors.green
+                                            ? WidgetUtil()
+                                                .parseHexColor(darkColor)
                                             : Colors.grey[300],
                                         borderRadius: BorderRadius.circular(5),
                                       ),
@@ -266,8 +255,9 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
                                             .parseHexColor(darkColor),
                                         onPressed: () async {
                                           final result = await Get.toNamed(
-                                              "/time-limit",
-                                              arguments: item);
+                                            "/schedule-page",
+                                            arguments: item,
+                                          );
                                           refreshJadwal();
                                         },
                                         icon: const Icon(Icons.edit),
@@ -313,7 +303,32 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
               ),
             ),
           ),
+          WidgetUtil().getAppBarV2(
+            titleScreen: "Jadwal Tersimpan",
+            callback: () {
+              Get.back(result: jadwalAktif);
+            },
+            context: context,
+            hasBackButton: true,
+          )
         ],
+      ),
+      bottomSheet: Container(
+        width: MediaQuery.of(context).size.width,
+        color: WidgetUtil().parseHexColor(darkColor),
+        child: TextButton.icon(
+          onPressed: () async {
+            final result = await Get.toNamed("/schedule-page");
+            if (result != null && result == "added") {
+              refreshJadwal();
+            }
+          },
+          icon: const Icon(Icons.add, color: Colors.white),
+          label: const Text(
+            "Tambah jadwal baru",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       ),
     );
   }

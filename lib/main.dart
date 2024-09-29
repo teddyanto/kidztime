@@ -3,6 +3,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/routes.dart';
+import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/preferences.dart';
 import 'package:kidztime/utils/widget_util.dart';
@@ -63,13 +64,16 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color primaryColor = WidgetUtil().parseHexColor('#012C3D');
-
     return GetMaterialApp(
       theme: ThemeData(
         fontFamily: 'Poppins',
-        primaryColor: primaryColor,
+        primaryColor: WidgetUtil().parseHexColor(primaryColor),
         primaryColorDark: Colors.black,
+        appBarTheme: AppBarTheme(
+          backgroundColor:
+              WidgetUtil().parseHexColor(primaryColor), // Global AppBar color
+          elevation: 0, // Customize the AppBar elevation if needed
+        ),
       ),
       defaultTransition: Transition.fade,
       debugShowCheckedModeBanner: false,

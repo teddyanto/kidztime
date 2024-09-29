@@ -23,11 +23,11 @@ class AboutScreen extends StatelessWidget {
                   const SizedBox(
                     height: 100,
                   ),
-                  const Center(
+                  Center(
                     child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage:
-                          AssetImage(logo), // Ganti dengan path logo aplikasi
+                      radius: MediaQuery.of(context).size.width * .15,
+                      backgroundImage: const AssetImage(
+                          logo), // Ganti dengan path logo aplikasi
                     ),
                   ),
                   const SizedBox(
@@ -197,9 +197,11 @@ class AboutScreen extends StatelessWidget {
                   const SizedBox(
                     height: 24,
                   ),
-                  const Text(
-                    "• Terima kasih telah menggunakan aplikasi kami •\nTeddy & Annisa",
-                    textAlign: TextAlign.center,
+                  const Center(
+                    child: Text(
+                      "• Terima kasih telah menggunakan aplikasi kami •\nTeddy & Annisa",
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   const SizedBox(
                     height: 24,

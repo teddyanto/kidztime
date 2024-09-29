@@ -358,10 +358,12 @@ class MenuWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Image.asset(
-                  icon,
-                  width: width * .11,
-                ),
+                icon != ""
+                    ? Image.asset(
+                        icon,
+                        width: width * .11,
+                      )
+                    : const Icon(Icons.lightbulb_circle_sharp),
                 const SizedBox(
                   height: 5,
                 ),

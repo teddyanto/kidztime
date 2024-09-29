@@ -2,17 +2,18 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/svg_assets.dart';
 import 'package:kidztime/utils/widget_util.dart';
 
-class AdsPage extends StatefulWidget {
-  const AdsPage({super.key});
+class AdsScreen extends StatefulWidget {
+  const AdsScreen({super.key});
 
   @override
-  _AdsPageState createState() => _AdsPageState();
+  _AdsScreenState createState() => _AdsScreenState();
 }
 
-class _AdsPageState extends State<AdsPage> {
+class _AdsScreenState extends State<AdsScreen> {
   int _currentIndex = 0;
 
   final List<Map<String, String>> wellcomes = [
@@ -58,6 +59,7 @@ class _AdsPageState extends State<AdsPage> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         automaticallyImplyLeading: false, // No back button
         actions: [
           TextButton(
@@ -81,14 +83,18 @@ class _AdsPageState extends State<AdsPage> {
                 cancelButtonText: "Tidak",
               );
             },
-            child: const Text(
-              "Lewati",
-              style: TextStyle(color: Colors.black),
+            child: Text(
+              "Skip",
+              style: TextStyle(
+                color: WidgetUtil().parseHexColor(primaryColor),
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
       ),
-      body: SizedBox(
+      body: Container(
+        color: Colors.white,
         height: height,
         child: Column(
           children: [
@@ -116,16 +122,14 @@ class _AdsPageState extends State<AdsPage> {
                         wellcomes[index]["image"]!,
                         height: height * .4,
                       ),
-                      // Image.asset(
-                      //   wellcomes[index]["image"]!,
-                      //   height: height * .4,
-                      // ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
                       Text(
                         wellcomes[index]["title"]!,
-                        style: const TextStyle(
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
+                          color: WidgetUtil().parseHexColor(primaryColor),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -134,8 +138,9 @@ class _AdsPageState extends State<AdsPage> {
                         child: Text(
                           wellcomes[index]["description"]!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
+                            color: Colors.grey.shade600,
                           ),
                         ),
                       ),
@@ -164,44 +169,57 @@ class _AdsPageState extends State<AdsPage> {
           ],
         ),
       ),
-      bottomNavigationBar: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Back button
-          TextButton(
-            onPressed: _currentIndex == 0
-                ? null // Disable back button if on first slide
-                : () {
-                    setState(() {
-                      _currentIndex--;
-                      _corouselController.previousPage();
-                    });
-                  },
-            child: const Text(
-              "Back",
+      bottomNavigationBar: Container(
+        width: width,
+        color: Colors.white,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Back button
+            TextButton(
+              onPressed: _currentIndex == 0
+                  ? null // Disable back button if on first slide
+                  : () {
+                      setState(() {
+                        _currentIndex--;
+                        _corouselController.previousPage();
+                      });
+                    },
+              child: Text(
+                "Back",
+                style: TextStyle(
+                  color: _currentIndex == 0
+                      ? null
+                      : WidgetUtil().parseHexColor(primaryColor),
+                ),
+              ),
             ),
-          ),
-          // Next button
-          TextButton(
-            onPressed: () {
-              if (_currentIndex == wellcomes.length - 1) {
-                Get.toNamed(
-                  '/setup-page',
-                  arguments: {
-                    'from': 'splash_screen',
-                  },
-                );
-              } else {
-                setState(() {
-                  _currentIndex++;
-                  _corouselController.nextPage();
-                });
-              }
-            },
-            child:
-                Text(_currentIndex == wellcomes.length - 1 ? "Finish" : "Next"),
-          ),
-        ],
+            // Next button
+            TextButton(
+              onPressed: () {
+                if (_currentIndex == wellcomes.length - 1) {
+                  Get.toNamed(
+                    '/setup-page',
+                    arguments: {
+                      'from': 'splash_screen',
+                    },
+                  );
+                } else {
+                  setState(() {
+                    _currentIndex++;
+                    _corouselController.nextPage();
+                  });
+                }
+              },
+              child: Text(
+                _currentIndex == wellcomes.length - 1 ? "Finish" : "Next",
+                style: TextStyle(
+                  color: WidgetUtil().parseHexColor(primaryColor),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
