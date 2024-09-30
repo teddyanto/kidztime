@@ -6,6 +6,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/aktivitas.dart';
 import 'package:kidztime/model/batasPenggunaan.dart';
+import 'package:kidztime/model/jadwalPenggunaan.dart';
 import 'package:kidztime/model/pengaturan.dart';
 import 'package:kidztime/page/widget/main_screen_widget.dart';
 import 'package:kidztime/utils/background_service.dart';
@@ -207,6 +208,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
                                       _remainingTime =
                                           (hours * 3600) + (minutes * 60);
                                     });
+                                  } else {
+                                    _remainingTime = 0;
                                   }
                                 });
                               }
@@ -219,8 +222,64 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             callBack: () async {
                               // Get.toNamed('/schedule-page');
                               // Get.toNamed('/list-schedule');
-                              final result =
-                                  await Get.toNamed("/list-schedule");
+                              final result = await Get.toNamed(
+                                "/list-schedule",
+                                arguments: {
+                                  'batasWaktuIsRunning': _batasWaktuIsRunning,
+                                },
+                              );
+
+                              if (_batasWaktuIsRunning == false) {
+                                setState(() {
+                                  if (result != null) {
+                                    Jadwalpenggunaan temp = result;
+
+                                    int waktuAkhirJam = int.parse(
+                                        temp.waktuAkhir.split(":")[0]);
+                                    int waktuAkhirMenit = int.parse(
+                                        temp.waktuAkhir.split(":")[1]);
+
+                                    DateTime date = DateTime.now();
+
+                                    int hourIndex = date.hour;
+                                    int minuteIndex = date.minute;
+
+                                    String batasWaktu0 =
+                                        "${(waktuAkhirJam - hourIndex).toString().padLeft(2, "0")}:${(waktuAkhirMenit - minuteIndex).toString().padLeft(2, "0")}";
+                                    WidgetUtil().getDayName(dayIndex);
+
+                                    Bataspenggunaan batasPenggunaanTemp =
+                                        Bataspenggunaan(
+                                            nama: "Batas terjadwal",
+                                            deskripsi:
+                                                "Batas terjadwal dengan detail waktu dari pukul ${temp.waktuMulai} sampai ${temp.waktuAkhir}",
+                                            batasWaktu: batasWaktu0,
+                                            batasToleransi: "00:05",
+                                            statusAktif: true);
+
+                                    _bataspenggunaan = batasPenggunaanTemp;
+
+                                    _batasWaktuIsRunning = false;
+
+                                    int hours = int.parse(_bataspenggunaan!
+                                        .batasWaktu
+                                        .split(":")[0]);
+                                    int minutes = int.parse(_bataspenggunaan!
+                                        .batasWaktu
+                                        .split(":")[1]);
+
+                                    setState(() {
+                                      _remainingTime =
+                                          (hours * 3600) + (minutes * 60);
+                                    });
+                                  } else {
+                                    _bataspenggunaan = null;
+                                    setState(() {
+                                      _remainingTime = 0;
+                                    });
+                                  }
+                                });
+                              }
                             },
                           ),
                           MenuWidget(
@@ -480,6 +539,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   void stopService() {
     updateStatusAktifBatasPenggunaan(dbKidztime, false);
+    updateStatusAktifJadwal(dbKidztime, false);
 
     setState(() {
       _bataspenggunaan = null;

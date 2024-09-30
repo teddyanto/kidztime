@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/batasPenggunaan.dart';
+import 'package:kidztime/model/jadwalPenggunaan.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
 import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
@@ -430,6 +431,8 @@ class _ListTimeLimitScreenState extends State<ListTimeLimitScreen> {
         refreshBatasPenggunaan();
       });
     });
+
+    updateStatusAktifJadwal(dbKidztime, false);
   }
 
   void handleDeleteBatasPengguna(int index, BuildContext context) {
