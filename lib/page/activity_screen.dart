@@ -17,20 +17,35 @@ class ActivityHistoryScreen extends StatefulWidget {
 class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
   final Future<Database> dbKidztime = DBKidztime().getDatabase();
   late List<Aktivitas> listAktivitas = [];
+  DateTimeRange? _selectedDates;
 
   @override
   void initState() {
     super.initState();
-    _initializeData();
+
+    DateTime currentDate = DateTime.now();
+
+    _selectedDates = DateTimeRange(
+      start: DateTime(currentDate.year, currentDate.month, 1),
+      end: DateTime(currentDate.year, currentDate.month,
+          DateTime(currentDate.year, currentDate.month + 1, 0).day),
+    );
+
+    _initializeData(_selectedDates!.start, _selectedDates!.end);
   }
 
-  Future<void> _initializeData() async {
+  Future<void> _initializeData(DateTime start, DateTime end) async {
     final database = await dbKidztime; // Get the database instance
     // insertDummyData(database); // Insert dummy data for testing
 
-    final aktivitas = await getAktivitas(database);
+    final aktivitas = await getAktivitasRange(
+      database,
+      start,
+      end,
+    );
     setState(() {
       listAktivitas = aktivitas;
+      print(listAktivitas);
     });
   }
 
@@ -55,19 +70,44 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
                 const SizedBox(
                   height: 100,
                 ),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("Rangkuman penggunaan"),
-                      Container(
-                        margin: const EdgeInsets.only(
-                          bottom: 5,
-                        ),
-                        height: 20,
-                        width: width * .3,
-                        child: const Placeholder(),
+                Container(
+                  margin: const EdgeInsets.only(bottom: 5),
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: _showSelectDatePicker,
+                    child: Container(
+                      padding: const EdgeInsets.all(
+                        3,
                       ),
-                    ]),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            width: 1,
+                            color: WidgetUtil().parseHexColor(darkColor),
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        '${_formatDateToString(_selectedDates?.start)}'
+                        ' s/d '
+                        '${_formatDateToString(_selectedDates?.end)}',
+                        softWrap: true,
+                        style: TextStyle(
+                          color: WidgetUtil().parseHexColor(darkColor),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Rangkuman penggunaan"),
+                  ],
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
                 const SizedBox(
                   height: 120,
                   child: Placeholder(),
@@ -198,5 +238,27 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
         ],
       ),
     );
+  }
+
+  String _formatDateToString(DateTime? date) {
+    if (date == null) return '-';
+
+    return '${date.year}-${date.month.toString().padLeft(2, "0")}-${date.day.toString().padLeft(2, "0")}';
+  }
+
+  Future _showSelectDatePicker() async {
+    final result = await showDateRangePicker(
+      context: context,
+      initialDateRange: _selectedDates,
+      firstDate: DateTime(2000), // tanggal awal yang diperbolehkan di pilih
+      lastDate: DateTime(2100), // tanggal akhir yang diperbolehkan di pilih
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedDates = result;
+        _initializeData(_selectedDates!.start, _selectedDates!.end);
+      });
+    }
   }
 }
