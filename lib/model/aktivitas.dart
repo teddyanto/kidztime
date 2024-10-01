@@ -102,3 +102,35 @@ Future<List<Aktivitas>> getAktivitas(Database database) async {
       ),
   ];
 }
+
+Future<List<Aktivitas>> getAktivitasRange(
+    Database database, DateTime start, DateTime end) async {
+  // Get a reference to the database.
+  final db = database;
+
+  // Convert DateTime start and end to a suitable format (e.g., string) for the query.
+  String startDate = start.subtract(const Duration(days: 1)).toIso8601String();
+  String endDate = end.add(const Duration(days: 1)).toIso8601String();
+
+  print(startDate);
+  print(endDate);
+  // Query the table for all the aktivitas within the date range.
+  final List<Map<String, Object?>> aktivitasMaps = await db.query(
+    tableName,
+    where: 'tanggal BETWEEN ? AND ?',
+    whereArgs: [startDate, endDate],
+    orderBy: 'id DESC',
+  );
+
+  // Convert the list of each aktivitas fields into a list of `Aktivitas` objects.
+  return [
+    for (final Map<String, dynamic> aktivitasMap in aktivitasMaps)
+      Aktivitas(
+        id: aktivitasMap['id'] as int,
+        judul: aktivitasMap['judul'] as String,
+        deskripsi: aktivitasMap['deskripsi'] as String,
+        waktu: aktivitasMap['waktu'] as int,
+        tanggal: aktivitasMap['tanggal'] as String,
+      ),
+  ];
+}
