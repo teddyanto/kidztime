@@ -6,6 +6,7 @@ import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/widget_util.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class ActivityHistoryScreen extends StatefulWidget {
   const ActivityHistoryScreen({super.key});
@@ -17,7 +18,17 @@ class ActivityHistoryScreen extends StatefulWidget {
 class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
   final Future<Database> dbKidztime = DBKidztime().getDatabase();
   late List<Aktivitas> listAktivitas = [];
+  late List<ChartData> dataChart = [];
+
   DateTimeRange? _selectedDates;
+
+  int bulanIni = 0;
+  double avgBulanIni = 0;
+
+  List<int> mingguIni = [0, 0];
+  double avgMingguIni = 0;
+
+  double avgJangkauanIni = 0;
 
   @override
   void initState() {
@@ -30,6 +41,30 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
       end: DateTime(currentDate.year, currentDate.month,
           DateTime(currentDate.year, currentDate.month + 1, 0).day),
     );
+
+    bulanIni = currentDate.month;
+
+    DateTime dateTemp = currentDate
+        .subtract(Duration(days: currentDate.weekday))
+        .add(const Duration(days: 1));
+
+    int tanggal = dateTemp.day;
+    int bulan = dateTemp.month;
+    int tahun = dateTemp.year;
+
+    mingguIni[0] = int.parse(
+        "$tahun${bulan.toString().padLeft(2, "0")}${tanggal.toString().padLeft(2, "0")}");
+
+    dateTemp = currentDate
+        .subtract(Duration(days: currentDate.weekday))
+        .add(const Duration(days: 7));
+
+    tanggal = dateTemp.day;
+    bulan = dateTemp.month;
+    tahun = dateTemp.year;
+
+    mingguIni[1] = int.parse(
+        "$tahun${bulan.toString().padLeft(2, "0")}${tanggal.toString().padLeft(2, "0")}");
 
     _initializeData(_selectedDates!.start, _selectedDates!.end);
   }
@@ -45,7 +80,62 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
     );
     setState(() {
       listAktivitas = aktivitas;
-      print(listAktivitas);
+    });
+    _rearrangeChart();
+  }
+
+  void _rearrangeChart() {
+    Map<String, double> temp = {};
+    dataChart.clear();
+
+    int countBulanIni = 0;
+    double tempAvgBulanIni = 0;
+
+    int countMingguIni = 0;
+    double tempAvgMingguIni = 0;
+
+    double tempAvgJangkauanIni = 0;
+
+    for (Aktivitas item in listAktivitas) {
+      int tanggal = DateTime.parse(item.tanggal).day;
+      int bulan = DateTime.parse(item.tanggal).month;
+      int tahun = DateTime.parse(item.tanggal).year;
+
+      int fullTanggal = int.parse(
+          "$tahun${bulan.toString().padLeft(2, "0")}${tanggal.toString().padLeft(2, "0")}");
+
+      String stanggal =
+          "${tanggal.toString().padLeft(2, "0")}/${bulan.toString().padLeft(2, "0")}";
+      double menit = (item.waktu / 60);
+
+      if (temp[stanggal] == null) {
+        temp[stanggal] = menit;
+      } else {
+        double currentTime = temp[stanggal] ?? 0;
+        temp[stanggal] = currentTime + menit;
+      }
+
+      if (bulanIni == bulan) {
+        countBulanIni++;
+        tempAvgBulanIni += menit;
+      }
+
+      if (fullTanggal >= mingguIni[0] && fullTanggal <= mingguIni[1]) {
+        countMingguIni++;
+        tempAvgMingguIni += menit;
+      }
+
+      tempAvgJangkauanIni += menit;
+    }
+
+    setState(() {
+      avgBulanIni = tempAvgBulanIni / countBulanIni;
+      avgMingguIni = tempAvgMingguIni / countMingguIni;
+      avgJangkauanIni = tempAvgJangkauanIni / listAktivitas.length;
+    });
+
+    temp.forEach((index, value) {
+      dataChart.add(ChartData(index, value));
     });
   }
 
@@ -108,9 +198,64 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
                 const SizedBox(
                   height: 5,
                 ),
-                const SizedBox(
-                  height: 120,
-                  child: Placeholder(),
+                Card(
+                  child: Container(
+                    color: Colors.blueGrey.shade300,
+                    padding: const EdgeInsets.all(4.0),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: width * .5,
+                          child: SfCartesianChart(
+                            // Initialize category axis
+                            primaryYAxis: const NumericAxis(
+                              // Define the Y-axis with a title (legend)
+                              title: AxisTitle(
+                                text: 'Dalam menit', // Label for the Y-axis
+                                textStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            primaryXAxis: const CategoryAxis(),
+                            series: <ColumnSeries<ChartData, String>>[
+                              ColumnSeries<ChartData, String>(
+                                  // Bind data source
+                                  dataSource: dataChart,
+                                  xValueMapper: (ChartData data, _) =>
+                                      data.date,
+                                  yValueMapper: (ChartData data, _) =>
+                                      data.value),
+                            ],
+                            backgroundColor: Colors.white,
+                          ),
+                        ),
+                        Wrap(
+                          children: [
+                            AverageWidget(
+                              title: "Bulan ini",
+                              menit: avgBulanIni,
+                            ),
+                            AverageWidget(
+                              title: "Minggu ini",
+                              menit: avgMingguIni,
+                            ),
+                            AverageWidget(
+                              title: "Jangkauan ini",
+                              menit: avgJangkauanIni,
+                            ),
+                          ],
+                        ),
+                        const Text(
+                          "Rata-rata penggunaan (dalam menit)",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(
                   height: 10,
@@ -261,4 +406,50 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
       });
     }
   }
+}
+
+class AverageWidget extends StatelessWidget {
+  AverageWidget({
+    super.key,
+    required this.menit,
+    required this.title,
+  });
+
+  double menit;
+  String title;
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Container(
+        color: WidgetUtil().parseHexColor(darkColor),
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Text(
+              menit.toStringAsFixed(1),
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              title,
+              textAlign: TextAlign.end,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ChartData {
+  ChartData(this.date, this.value);
+  final String date;
+  final double value;
 }
