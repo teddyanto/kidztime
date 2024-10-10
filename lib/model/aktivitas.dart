@@ -119,7 +119,7 @@ Future<List<Aktivitas>> getAktivitasRange(
     tableName,
     where: 'tanggal BETWEEN ? AND ?',
     whereArgs: [startDate, endDate],
-    orderBy: 'id DESC',
+    orderBy: 'id ASC',
   );
 
   // Convert the list of each aktivitas fields into a list of `Aktivitas` objects.
