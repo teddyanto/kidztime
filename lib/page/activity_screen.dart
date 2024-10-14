@@ -129,9 +129,17 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
     }
 
     setState(() {
-      avgBulanIni = tempAvgBulanIni / countBulanIni;
-      avgMingguIni = tempAvgMingguIni / countMingguIni;
-      avgJangkauanIni = tempAvgJangkauanIni / listAktivitas.length;
+      if (countBulanIni > 0) {
+        avgBulanIni = tempAvgBulanIni / countBulanIni;
+      }
+
+      if (countMingguIni > 0) {
+        avgMingguIni = tempAvgMingguIni / countMingguIni;
+      }
+
+      if (listAktivitas.isNotEmpty) {
+        avgJangkauanIni = tempAvgJangkauanIni / listAktivitas.length;
+      }
     });
 
     temp.forEach((index, value) {
