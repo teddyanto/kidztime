@@ -5,6 +5,8 @@ import 'package:kidztime/page/ads_screen.dart';
 import 'package:kidztime/page/guidance_screen.dart';
 import 'package:kidztime/page/lock_screen.dart';
 import 'package:kidztime/page/main_screen.dart';
+import 'package:kidztime/page/notifikasi_screen/list_notifikasi_screen.dart';
+import 'package:kidztime/page/notifikasi_screen/notification_screen.dart';
 import 'package:kidztime/page/schedule_screen/list_schedule_screen.dart';
 import 'package:kidztime/page/schedule_screen/schedule_screen.dart';
 import 'package:kidztime/page/setup_screen.dart';
@@ -80,6 +82,16 @@ class Routes {
       GetPage(
         name: '/about-page',
         page: () => const AboutScreen(),
+        transition: Transition.rightToLeft,
+      ),
+      GetPage(
+        name: '/notification-page',
+        page: () => const NotificationScreen(),
+        transition: Transition.rightToLeft,
+      ),
+      GetPage(
+        name: '/list-notifications-page',
+        page: () => const ListNotifikasiScreen(),
         transition: Transition.rightToLeft,
       ),
     ];

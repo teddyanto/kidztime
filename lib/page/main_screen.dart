@@ -3,15 +3,18 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/aktivitas.dart';
 import 'package:kidztime/model/batasPenggunaan.dart';
 import 'package:kidztime/model/jadwalPenggunaan.dart';
+import 'package:kidztime/model/notifikasi.dart';
 import 'package:kidztime/model/pengaturan.dart';
 import 'package:kidztime/page/widget/main_screen_widget.dart';
 import 'package:kidztime/utils/background_service.dart';
 import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
+import 'package:kidztime/utils/notification_service.dart';
 import 'package:kidztime/utils/png_assets.dart';
 import 'package:kidztime/utils/preferences.dart';
 import 'package:kidztime/utils/widget_util.dart';
@@ -27,6 +30,8 @@ class MainMenuPage extends StatefulWidget {
 class _MainMenuPageState extends State<MainMenuPage> {
   final Future<Database> dbKidztime = DBKidztime().getDatabase();
   late List<Aktivitas> daftarAktivitas = [];
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   late Bataspenggunaan? _bataspenggunaan;
 
@@ -42,6 +47,16 @@ class _MainMenuPageState extends State<MainMenuPage> {
   @override
   void initState() {
     super.initState();
+
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     _bataspenggunaan = null;
 
@@ -114,6 +129,19 @@ class _MainMenuPageState extends State<MainMenuPage> {
           setState(() {
             _remainingTime -= 1;
           });
+          // Fetch the notifikasi records and check if remaining time matches the waktu field
+          final List<Notifikasi> notifikasis =
+              await fetchNotifikasis(dbKidztime);
+
+          for (var notifikasi in notifikasis) {
+            if (_remainingTime == notifikasi.waktu * 60) {
+              // Assuming waktu is in minutes, convert to seconds
+              // Trigger the notification when remaining time matches waktu
+              await NotificationService()
+                  .scheduleNotifications(dbKidztime, _remainingTime);
+              print('Notification triggered for ${notifikasi.judul}');
+            }
+          }
         }
       });
     });
@@ -308,6 +336,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
                           ),
                           MenuWidget(
                             width: width,
+                            icon: iconMenu4,
+                            title: "Notifikasi",
+                            callBack: () {
+                              Get.toNamed("/list-notifications-page");
+                            },
+                          ),
+                          MenuWidget(
+                            width: width,
                             icon: iconMenu6,
                             title: "Tentang aplikasi",
                             callBack: () {
@@ -324,6 +360,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
                           // ),
                         ],
                       ),
+                      // Center(
+                      //   child: ElevatedButton(
+                      //     onPressed: () {
+                      //       _showNotification(); // Call the method to show notification
+                      //     },
+                      //     child: const Text('Test Notification'),
+                      //   ),
+                      // ),
                       BatasWaktuBarWidget(
                         aktif: _batasWaktuIsRunning,
                         remainingTime: _remainingTime,

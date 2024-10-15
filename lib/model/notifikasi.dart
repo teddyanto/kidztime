@@ -1,10 +1,15 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sqflite/sqflite.dart';
+
+// Initialize local notifications
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 class Notifikasi {
   final int id;
   final String judul;
   final String detail;
-  final String waktu;
+  final int waktu;
 
   Notifikasi({
     required this.id,
@@ -28,18 +33,34 @@ class Notifikasi {
   }
 }
 
-Future<void> insertNotifikasi(
+Future<void> insertOrUpdateNotifikasi(
   Future<Database> database,
   Notifikasi notifikasi,
 ) async {
   final db = await database;
+
   await db
       .insert(
     'Notifikasi',
     notifikasi.toMap(),
-    conflictAlgorithm: ConflictAlgorithm.replace,
+    conflictAlgorithm:
+        ConflictAlgorithm.replace, // This ensures it replaces if it exists
   )
-      .then((e) {
-    print('Notifikasi berhasil ditambahkan ${notifikasi.toString()}');
+      .then((_) {
+    print('Notifikasi berhasil ditambahkan: ${notifikasi.toString()}');
+  });
+}
+
+Future<List<Notifikasi>> fetchNotifikasis(Future<Database> database) async {
+  final db = await database;
+  final List<Map<String, dynamic>> maps = await db.query('Notifikasi');
+
+  return List.generate(maps.length, (i) {
+    return Notifikasi(
+      id: maps[i]['id'],
+      judul: maps[i]['judul'],
+      detail: maps[i]['detail'],
+      waktu: maps[i]['waktu'], // Fetch as integer
+    );
   });
 }
