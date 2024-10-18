@@ -27,6 +27,27 @@ class MainMenuPage extends StatefulWidget {
   State<MainMenuPage> createState() => _MainMenuPageState();
 }
 
+void _showNotification() {
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+    'your channel id',
+    'your channel name',
+    channelDescription: 'your_channel_description',
+    importance: Importance.max,
+    priority: Priority.high,
+    showWhen: false,
+  );
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+  flutterLocalNotificationsPlugin.show(
+    0,
+    'Test Notification',
+    'This is a test notification',
+    platformChannelSpecifics,
+    payload: 'item x',
+  );
+}
+
 class _MainMenuPageState extends State<MainMenuPage> {
   final Future<Database> dbKidztime = DBKidztime().getDatabase();
   late List<Aktivitas> daftarAktivitas = [];
@@ -130,18 +151,18 @@ class _MainMenuPageState extends State<MainMenuPage> {
             _remainingTime -= 1;
           });
           // Fetch the notifikasi records and check if remaining time matches the waktu field
-          final List<Notifikasi> notifikasis =
-              await fetchNotifikasis(dbKidztime);
+          // final List<Notifikasi> notifikasis =
+          //     await fetchNotifikasis(dbKidztime);
 
-          for (var notifikasi in notifikasis) {
-            if (_remainingTime == notifikasi.waktu * 60) {
-              // Assuming waktu is in minutes, convert to seconds
-              // Trigger the notification when remaining time matches waktu
-              await NotificationService()
-                  .scheduleNotifications(dbKidztime, _remainingTime);
-              print('Notification triggered for ${notifikasi.judul}');
-            }
-          }
+          // for (var notifikasi in notifikasis) {
+          //   if (_remainingTime == notifikasi.waktu * 60) {
+          //     // Assuming waktu is in minutes, convert to seconds
+          //     // Trigger the notification when remaining time matches waktu
+          //     await NotificationService()
+          //         .scheduleNotifications(dbKidztime, _remainingTime);
+          //     print('Notification triggered for ${notifikasi.judul}');
+          //   }
+          // }
         }
       });
     });
@@ -360,14 +381,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
                           // ),
                         ],
                       ),
-                      // Center(
-                      //   child: ElevatedButton(
-                      //     onPressed: () {
-                      //       _showNotification(); // Call the method to show notification
-                      //     },
-                      //     child: const Text('Test Notification'),
-                      //   ),
-                      // ),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            _showNotification(); // Call the method to show notification when button clicked
+                          },
+                          child: const Text('Test Notification Popup'),
+                        ),
+                      ),
                       BatasWaktuBarWidget(
                         aktif: _batasWaktuIsRunning,
                         remainingTime: _remainingTime,
