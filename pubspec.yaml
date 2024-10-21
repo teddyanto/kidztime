@@ -51,10 +51,14 @@ dependencies:
   url_launcher: ^6.3.0
   carousel_slider: ^5.0.0
   flutter_svg: ^2.0.10+1
+
   flutter_local_notifications: ^17.0.0
   timezone: ^0.9.0                       # Replace with the latest version
 
   
+
+  syncfusion_flutter_charts: ^27.1.51
+
 
 dev_dependencies:
   flutter_test:
