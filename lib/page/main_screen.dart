@@ -14,7 +14,6 @@ import 'package:kidztime/page/widget/main_screen_widget.dart';
 import 'package:kidztime/utils/background_service.dart';
 import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
-import 'package:kidztime/utils/notification_service.dart';
 import 'package:kidztime/utils/png_assets.dart';
 import 'package:kidztime/utils/preferences.dart';
 import 'package:kidztime/utils/widget_util.dart';
@@ -146,23 +145,17 @@ class _MainMenuPageState extends State<MainMenuPage> {
       _timer = Timer.periodic(const Duration(seconds: 1), (a) async {
         if (_remainingTime == 0) {
           _timer.cancel();
+          updateStatusAktifBatasPenggunaan(dbKidztime, false);
+          updateStatusAktifJadwal(dbKidztime, false);
+
+          setState(() {
+            _bataspenggunaan = null;
+            _batasWaktuIsRunning = false;
+          });
         } else {
           setState(() {
             _remainingTime -= 1;
           });
-          // Fetch the notifikasi records and check if remaining time matches the waktu field
-          // final List<Notifikasi> notifikasis =
-          //     await fetchNotifikasis(dbKidztime);
-
-          // for (var notifikasi in notifikasis) {
-          //   if (_remainingTime == notifikasi.waktu * 60) {
-          //     // Assuming waktu is in minutes, convert to seconds
-          //     // Trigger the notification when remaining time matches waktu
-          //     await NotificationService()
-          //         .scheduleNotifications(dbKidztime, _remainingTime);
-          //     print('Notification triggered for ${notifikasi.judul}');
-          //   }
-          // }
         }
       });
     });

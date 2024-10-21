@@ -184,7 +184,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
           // Create notification model
           Notifikasi notifikasi = Notifikasi(
-              id: id ?? 1, // Provide a default value if id is null
+              id: id ?? -1, // Provide a default value if id is null
               judul: judulController.text,
               detail: detailController.text,
               waktu: totalMinutes); // Use the calculated total minutes

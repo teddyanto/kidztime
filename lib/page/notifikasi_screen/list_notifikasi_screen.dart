@@ -1,12 +1,13 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:kidztime/model/notifikasi.dart'; // Ensure your Notifikasi model reflects the new structure
+import 'package:kidztime/page/widget/card_widget.dart';
 import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/widget_util.dart';
-import 'package:kidztime/page/widget/card_widget.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:get/get.dart';
 
 class ListNotifikasiScreen extends StatefulWidget {
   const ListNotifikasiScreen({super.key});
@@ -142,11 +143,11 @@ class _ListNotifikasiScreenState extends State<ListNotifikasiScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
+                                  const Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Text(
+                                      Text(
                                         "Notifikasi",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
@@ -236,6 +237,7 @@ class _ListNotifikasiScreenState extends State<ListNotifikasiScreen> {
           listNotifikasi = notifikasi;
           resultSearch = notifikasi;
         });
+        print(notifikasi);
       });
     });
   }

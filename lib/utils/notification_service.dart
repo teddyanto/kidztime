@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:kidztime/model/notifikasi.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -12,7 +10,7 @@ class NotificationService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
 
     await flutterLocalNotificationsPlugin.initialize(
@@ -42,7 +40,8 @@ class NotificationService {
 
   Future<void> scheduleNotifications(
       Future<Database> database, int remainingTime) async {
-    final List<Notifikasi> notifikasis = await fetchNotifikasis(database);
+    final List<Notifikasi> notifikasis =
+        await fetchNotifikasisOrderByWaktuDesc(database);
 
     for (var notifikasi in notifikasis) {
       // Convert notifikasi.waktu (which is in minutes) to seconds
