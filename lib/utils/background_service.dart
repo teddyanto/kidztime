@@ -77,8 +77,6 @@ void onStart(ServiceInstance service) async {
             listNotifikasi.removeAt(0);
           }
 
-          print("SISA WAKTU : $remainingTime");
-          print("Notif Sisa Waktu  : $notifSisaWaktu");
           if (remainingTime == notifSisaWaktu) {
             await flutterLocalNotificationsPlugin.show(
               listNotifikasi.first.id,
