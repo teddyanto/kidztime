@@ -42,8 +42,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
       judulController.text = args.judul;
       detailController.text = args.detail;
       // Convert string time to TimeOfDay if necessary
-      _selectedTime =
-          TimeOfDay.fromDateTime(DateTime.parse(args.waktu.toString()));
+      int minutes = args.waktu;
+      int hours = (minutes / 60).floor();
+      minutes = minutes % 60;
+
+      _selectedTime = TimeOfDay(hour: hours, minute: minutes);
+      waktuController.text =
+          "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}";
     }
   }
 
