@@ -5,4 +5,5 @@ const iconMenu3 = "assets/png/icon_menu3.png";
 const iconMenu4 = "assets/png/icon_menu4.png";
 const iconMenu5 = "assets/png/icon_menu5.png";
 const iconMenu6 = "assets/png/icon_menu6.png";
+const iconMenu7 = "assets/png/icon_menu7.png";
 const iconBinus = "assets/png/logo-binus.png";

@@ -133,7 +133,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
     final db = await database;
 
     getAktivitas(db).then((data) {
-      print("getAktivitas ${data.toString()}");
       setState(() {
         daftarAktivitas = data;
       });
@@ -147,6 +146,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
           _timer.cancel();
           updateStatusAktifBatasPenggunaan(dbKidztime, false);
           updateStatusAktifJadwal(dbKidztime, false);
+          refreshDaftarAktivitas(dbKidztime);
 
           setState(() {
             _bataspenggunaan = null;
@@ -350,7 +350,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                           ),
                           MenuWidget(
                             width: width,
-                            icon: iconMenu4,
+                            icon: iconMenu7,
                             title: "Notifikasi",
                             callBack: () {
                               Get.toNamed("/list-notifications-page");
@@ -364,14 +364,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
                               Get.toNamed("/about-page");
                             },
                           ),
-                          // MenuWidget(
-                          //   width: width,
-                          //   icon: "",
-                          //   title: "Advertisment",
-                          //   callBack: () {
-                          //     Get.toNamed("/ads-page");
-                          //   },
-                          // ),
                         ],
                       ),
                       Center(
@@ -491,16 +483,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   );
 
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-                  // snackBar = const SnackBar(
-                  //   behavior: SnackBarBehavior.floating,
-                  //   content: Text(
-                  //     'Silahkan masuk ke menu `Batas Waktu`',
-                  //   ),
-                  //   duration: Duration(seconds: 4),
-                  // );
-
-                  // ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 }
               },
               style: ButtonStyle(

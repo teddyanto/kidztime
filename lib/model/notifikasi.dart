@@ -106,3 +106,15 @@ Future<List<Notifikasi>> fetchNotifikasisOrderByWaktuDesc(
     );
   });
 }
+
+Future<void> deleteNotifikasiById(Future<Database> database, int id) async {
+  final db = await database;
+
+  await db.delete(
+    tableName,
+    where: 'id = ?',
+    whereArgs: [
+      id,
+    ],
+  );
+}

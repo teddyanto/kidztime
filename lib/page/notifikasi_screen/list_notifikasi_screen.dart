@@ -163,7 +163,7 @@ class _ListNotifikasiScreenState extends State<ListNotifikasiScreen> {
                                           color: Colors.black54),
                                       const SizedBox(width: 5),
                                       Text(
-                                        "Waktu: ${item.waktu}",
+                                        "Waktu: ${item.waktu} menit",
                                         style: const TextStyle(
                                             color: Colors.black87),
                                       ),
@@ -187,6 +187,37 @@ class _ListNotifikasiScreenState extends State<ListNotifikasiScreen> {
                                       Text(item.detail),
                                     ],
                                   ),
+                                  const SizedBox(height: 5),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      IconButton.filledTonal(
+                                        color: WidgetUtil()
+                                            .parseHexColor(darkColor),
+                                        onPressed: () async {
+                                          await Get.toNamed(
+                                            "/notification-page",
+                                            arguments: item,
+                                          );
+
+                                          refreshNotifikasi();
+                                        },
+                                        icon: const Icon(Icons.edit),
+                                      ),
+                                      IconButton.filledTonal(
+                                        color: Colors.red,
+                                        onPressed: () {
+                                          handleDeleteNotifikasi(
+                                            index,
+                                            context,
+                                          );
+                                        },
+                                        icon: const Icon(
+                                          Icons.delete,
+                                        ),
+                                      ),
+                                    ],
+                                  )
                                 ],
                               ),
                             ),
@@ -232,7 +263,7 @@ class _ListNotifikasiScreenState extends State<ListNotifikasiScreen> {
 
   void refreshNotifikasi() {
     dbKidztime.then((db) {
-      fetchNotifikasis(Future.value(db)).then((notifikasi) {
+      fetchNotifikasisOrderByWaktuDesc(Future.value(db)).then((notifikasi) {
         setState(() {
           listNotifikasi = notifikasi;
           resultSearch = notifikasi;
@@ -243,13 +274,34 @@ class _ListNotifikasiScreenState extends State<ListNotifikasiScreen> {
   }
 
   void handleDeleteNotifikasi(int index, BuildContext context) async {
-    final db = await dbKidztime;
-    await db.delete('Notifikasi',
-        where: 'id = ?', whereArgs: [listNotifikasi[index].id]);
+    Notifikasi tempRemove = resultSearch[index];
 
+    // Remove the item from the list
     setState(() {
-      listNotifikasi.removeAt(index);
       resultSearch.removeAt(index);
     });
+
+    // Handle the deletion, and add logic for undoing the deletion if needed
+    Timer timerDelete = Timer(const Duration(seconds: 4), () {
+      deleteNotifikasiById(dbKidztime, tempRemove.id ?? 0);
+    });
+
+    SnackBar snackBar = SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: const Text('Notifikasi waktu berhasil dihapus!'),
+      action: SnackBarAction(
+        label: "batal",
+        onPressed: () {
+          // Reinsert the item if the action is canceled
+          setState(() {
+            resultSearch.insert(index, tempRemove);
+          });
+          timerDelete.cancel();
+        },
+      ),
+      duration: const Duration(seconds: 3),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
