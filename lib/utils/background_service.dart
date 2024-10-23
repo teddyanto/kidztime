@@ -51,8 +51,6 @@ void onStart(ServiceInstance service) async {
     serviceStopped(dbKidztime, timer, service);
   });
 
-  print("MMMM ada yg ubah dari background_service.dart 333");
-
   await Preferences.getLockTime().then((lockTime) async {
     /** Initialize notifikasi already set */
 

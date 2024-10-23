@@ -136,24 +136,47 @@ class _SetupscreenState extends State<Setupscreen> {
                       const SizedBox(
                         height: 25,
                       ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: InkWell(
-                          onTap: () {
-                            _saveAppSetup();
-                          },
-                          borderRadius: BorderRadius.circular(10.0),
-                          splashColor: Colors.amber,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 40.0,
-                              vertical: 5.0,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton.icon(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStatePropertyAll(
+                                WidgetUtil().parseHexColor(primaryColor),
+                              ),
                             ),
-                            decoration: BoxDecoration(
-                              color: WidgetUtil().parseHexColor(darkColor),
-                              borderRadius: BorderRadius.circular(10.0),
+                            onPressed: () {
+                              Get.toNamed("/lock-page");
+                            },
+                            label: const Row(
+                              children: [
+                                Text(
+                                  "Trial ",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.lock,
+                                  color: Colors.white,
+                                ),
+                              ],
                             ),
-                            child: const Text(
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          ElevatedButton.icon(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStatePropertyAll(
+                                WidgetUtil().parseHexColor(darkColor),
+                              ),
+                            ),
+                            onPressed: () {
+                              _saveAppSetup();
+                            },
+                            label: const Text(
                               'Save',
                               style: TextStyle(
                                 color: Colors.white,
@@ -161,7 +184,7 @@ class _SetupscreenState extends State<Setupscreen> {
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),

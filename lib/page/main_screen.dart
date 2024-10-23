@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:kidztime/model/aktivitas.dart';
 import 'package:kidztime/model/batasPenggunaan.dart';
 import 'package:kidztime/model/jadwalPenggunaan.dart';
-import 'package:kidztime/model/notifikasi.dart';
 import 'package:kidztime/model/pengaturan.dart';
 import 'package:kidztime/page/widget/main_screen_widget.dart';
 import 'package:kidztime/utils/background_service.dart';
@@ -24,27 +23,6 @@ class MainMenuPage extends StatefulWidget {
 
   @override
   State<MainMenuPage> createState() => _MainMenuPageState();
-}
-
-void _showNotification() {
-  const AndroidNotificationDetails androidPlatformChannelSpecifics =
-      AndroidNotificationDetails(
-    'your channel id',
-    'your channel name',
-    channelDescription: 'your_channel_description',
-    importance: Importance.max,
-    priority: Priority.high,
-    showWhen: false,
-  );
-  const NotificationDetails platformChannelSpecifics =
-      NotificationDetails(android: androidPlatformChannelSpecifics);
-  flutterLocalNotificationsPlugin.show(
-    0,
-    'Test Notification',
-    'This is a test notification',
-    platformChannelSpecifics,
-    payload: 'item x',
-  );
 }
 
 class _MainMenuPageState extends State<MainMenuPage> {
@@ -365,14 +343,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             },
                           ),
                         ],
-                      ),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _showNotification(); // Call the method to show notification when button clicked
-                          },
-                          child: const Text('Test Notification Popup'),
-                        ),
                       ),
                       BatasWaktuBarWidget(
                         aktif: _batasWaktuIsRunning,

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:kidztime/model/notifikasi.dart'; // Ensure your Notifikasi model reflects the new structure
 import 'package:kidztime/page/widget/card_widget.dart';
@@ -216,6 +217,21 @@ class _ListNotifikasiScreenState extends State<ListNotifikasiScreen> {
                                           Icons.delete,
                                         ),
                                       ),
+                                      IconButton.filledTonal(
+                                        color: WidgetUtil()
+                                            .parseHexColor(darkColor),
+                                        onPressed: () {
+                                          _showNotification(item);
+                                        },
+                                        icon: const Row(
+                                          children: [
+                                            Text("Trial "),
+                                            Icon(
+                                              Icons.volume_up_rounded,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   )
                                 ],
@@ -271,6 +287,28 @@ class _ListNotifikasiScreenState extends State<ListNotifikasiScreen> {
         print(notifikasi);
       });
     });
+  }
+
+  void _showNotification(Notifikasi notif) {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      '912',
+      'com.binus.kidztime',
+      channelDescription: 'Notification for Kidztime Apps',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: false,
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+    flutterLocalNotificationsPlugin.show(
+      notif.id,
+      notif.judul,
+      notif.detail,
+      platformChannelSpecifics,
+      payload: 'Notification for ${listNotifikasi.first.judul}',
+    );
   }
 
   void handleDeleteNotifikasi(int index, BuildContext context) async {
