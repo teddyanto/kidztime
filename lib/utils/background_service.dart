@@ -52,71 +52,86 @@ void onStart(ServiceInstance service) async {
   });
 
   await Preferences.getLockTime().then((lockTime) async {
-    /** Initialize notifikasi already set */
+    // Mendapatkan waktu penguncian dari preferensi pengguna.
 
+    /** Initialize notifikasi already set */
     final List<Notifikasi> listNotifikasi =
         await fetchNotifikasisOrderByWaktuDesc(dbKidztime);
+    // Mengambil daftar notifikasi yang sudah diatur, disusun berdasarkan waktu secara menurun (paling terbaru berada di awal daftar).
     /** --------------------------------- */
 
     timer = Timer.periodic(const Duration(seconds: 1), (a) async {
+      // Membuat timer yang berjalan setiap detik.
+
       if (service is AndroidServiceInstance) {
+        // Memastikan service ini berjalan sebagai AndroidServiceInstance.
+
         DateTime now = DateTime.now();
+        // Mengambil waktu sekarang.
 
         /** Memunculkan notifikasi */
 
         if (listNotifikasi.isNotEmpty) {
-          int remainingTime = lockTime.difference(now).inSeconds;
+          // Memastikan ada notifikasi di dalam daftar.
 
-          // Convert notifikasi.waktu (which is in minutes) to seconds
+          int remainingTime = lockTime.difference(now).inSeconds;
+          // Menghitung sisa waktu hingga penguncian dalam satuan detik.
+
+          // Mengonversi notifikasi.waktu (dalam menit) menjadi detik.
           int notifSisaWaktu = listNotifikasi.first.waktu * 60;
 
           /** Skip jika notif sisa waktu notif > remaining time */
           if (notifSisaWaktu > remainingTime) {
             listNotifikasi.removeAt(0);
+            // Menghapus notifikasi pertama dari daftar jika sisa waktunya lebih besar dari waktu penguncian.
           }
 
           if (remainingTime == notifSisaWaktu) {
-            await flutterLocalNotificationsPlugin.show(
-              listNotifikasi.first.id,
-              listNotifikasi.first.judul,
-              listNotifikasi.first.detail,
-              const NotificationDetails(
-                android: AndroidNotificationDetails(
-                  '912',
-                  appPackage,
-                  channelDescription: 'Notification for Kidztime Apps',
-                  importance: Importance.max,
-                  priority: Priority.high,
-                ),
-              ),
-              payload:
-                  'Notification for ${listNotifikasi.first.judul}', // Optional payload
-            );
+            // Jika waktu tersisa sama dengan waktu yang diatur dalam notifikasi.
+            await showNotification(
+                flutterLocalNotificationsPlugin, listNotifikasi);
+            // Menampilkan notifikasi kepada pengguna.
 
             listNotifikasi.removeAt(0);
+            // Menghapus notifikasi setelah ditampilkan.
           }
         }
 
         /** ---------------------- */
 
         if (now.isAfter(lockTime)) {
-          print("WAKTU SUDAH HABIS");
+          // Jika waktu sekarang telah melewati waktu penguncian.
           serviceStopped(dbKidztime, timer, service).then((value) {
             openApp();
+            // Menghentikan layanan, mengupdate status di database, dan membuka aplikasi utama.
           });
-        }
-
-        if (await service.isForegroundService()) {
-          service.setForegroundNotificationInfo(
-            title: "Kidztime service",
-            content: "Device akan terkunci pada $lockTime",
-          );
         }
       }
     });
   });
 
   // bring to foreground
+}
+
+Future<void> showNotification(
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
+    List<Notifikasi> listNotifikasi) async {
+  await flutterLocalNotificationsPlugin.show(
+    listNotifikasi.first.id,
+    listNotifikasi.first.judul,
+    listNotifikasi.first.detail,
+    const NotificationDetails(
+      android: AndroidNotificationDetails(
+        '912',
+        appPackage,
+        channelDescription: 'Notification for Kidztime Apps',
+        importance: Importance.max,
+        priority: Priority.high,
+      ),
+    ),
+    payload:
+        'Notification for ${listNotifikasi.first.judul}', // Optional payload
+  );
 }
 
 Future<void> serviceStopped(

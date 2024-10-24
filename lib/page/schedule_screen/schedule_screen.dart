@@ -27,6 +27,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   void initState() {
     super.initState();
+    id = null;
 
     if (Get.arguments != null) {
       final args = Get.arguments;
