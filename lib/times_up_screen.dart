@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_screen_lock/flutter_screen_lock.dart';
+import 'package:kidztime/model/aktivitas.dart';
 import 'package:kidztime/model/pengaturan.dart';
 import 'package:kidztime/page/widget/card_widget.dart';
 import 'package:kidztime/utils/database.dart';
 import 'package:kidztime/utils/png_assets.dart';
+import 'package:kidztime/utils/preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TimesUpScreen extends StatefulWidget {
@@ -18,6 +20,8 @@ class TimesUpScreen extends StatefulWidget {
 }
 
 class _TimesUpScreenState extends State<TimesUpScreen> {
+  final Future<Database> dbKidztime = DBKidztime().getDatabase();
+
   int countDown = 3;
   late Timer countTimer;
 
@@ -83,7 +87,7 @@ class _TimesUpScreenState extends State<TimesUpScreen> {
                   ),
                 ),
                 onUnlocked: () async {
-                  FlutterBackgroundService().invoke("stopService");
+                  saveUsage();
                   SystemNavigator.pop();
                 },
               );
@@ -91,6 +95,25 @@ class _TimesUpScreenState extends State<TimesUpScreen> {
           });
         }
       });
+    });
+  }
+
+  void saveUsage() {
+    Preferences.getTempAktivitas().then((tempAktivitas) {
+      DateTime now = DateTime.now();
+      DateTime startTime = DateTime.parse(tempAktivitas.tanggal);
+      Duration alreadyRunning = now.difference(startTime);
+
+      Aktivitas aktivitas = Aktivitas(
+        judul: tempAktivitas.judul,
+        deskripsi: tempAktivitas.deskripsi,
+        waktu: alreadyRunning.inSeconds,
+        tanggal: tempAktivitas.tanggal,
+      );
+
+      FlutterBackgroundService().invoke("stopService");
+
+      insertAktivitas(dbKidztime, aktivitas);
     });
   }
 

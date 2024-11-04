@@ -8,19 +8,19 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 const tableName = "Notifikasi";
 
 class Notifikasi {
-  final int id;
+  final int? id;
   final String judul;
   final String detail;
   final int waktu;
 
   Notifikasi({
-    required this.id,
+    this.id,
     required this.judul,
     required this.detail,
     required this.waktu,
   });
 
-  Map<String, Object> toMap() {
+  Map<String, Object?> toMap() {
     return {
       'id': id,
       'judul': judul,

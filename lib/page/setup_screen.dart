@@ -140,30 +140,31 @@ class _SetupscreenState extends State<Setupscreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ElevatedButton.icon(
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll(
-                                WidgetUtil().parseHexColor(primaryColor),
+                          if (hasBackButton)
+                            ElevatedButton.icon(
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStatePropertyAll(
+                                  WidgetUtil().parseHexColor(primaryColor),
+                                ),
                               ),
-                            ),
-                            onPressed: () {
-                              Get.toNamed("/lock-page");
-                            },
-                            label: const Row(
-                              children: [
-                                Text(
-                                  "Trial ",
-                                  style: TextStyle(
+                              onPressed: () {
+                                Get.toNamed("/times-up");
+                              },
+                              label: const Row(
+                                children: [
+                                  Text(
+                                    "Trial ",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.lock,
                                     color: Colors.white,
                                   ),
-                                ),
-                                Icon(
-                                  Icons.lock,
-                                  color: Colors.white,
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
                           const SizedBox(
                             width: 5,
                           ),

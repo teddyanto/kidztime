@@ -203,7 +203,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         },
       );
     } else {
-      WidgetUtil().showToast(msg: "Invalid input for schedule entry!");
+      WidgetUtil().showToast(msg: "Mohon isi data dengan benar!");
     }
   }
 }

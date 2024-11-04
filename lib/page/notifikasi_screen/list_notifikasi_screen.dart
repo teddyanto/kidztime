@@ -303,7 +303,7 @@ class _ListNotifikasiScreenState extends State<ListNotifikasiScreen> {
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
     flutterLocalNotificationsPlugin.show(
-      notif.id,
+      notif.id ?? 0,
       notif.judul,
       notif.detail,
       platformChannelSpecifics,

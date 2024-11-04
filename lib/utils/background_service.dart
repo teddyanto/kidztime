@@ -48,7 +48,8 @@ void onStart(ServiceInstance service) async {
   }
 
   service.on('stopService').listen((event) {
-    serviceStopped(dbKidztime, timer, service);
+    service.stopSelf();
+    // serviceStopped(dbKidztime, timer, service);
   });
 
   await Preferences.getLockTime().then((lockTime) async {
@@ -100,11 +101,11 @@ void onStart(ServiceInstance service) async {
         /** ---------------------- */
 
         if (now.isAfter(lockTime)) {
+          openApp();
           // Jika waktu sekarang telah melewati waktu penguncian.
-          serviceStopped(dbKidztime, timer, service).then((value) {
-            openApp();
-            // Menghentikan layanan, mengupdate status di database, dan membuka aplikasi utama.
-          });
+          // serviceStopped(dbKidztime, timer, service).then((value) {
+          //   // Menghentikan layanan, mengupdate status di database, dan membuka aplikasi utama.
+          // });
         }
       }
     });
@@ -117,7 +118,7 @@ Future<void> showNotification(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
     List<Notifikasi> listNotifikasi) async {
   await flutterLocalNotificationsPlugin.show(
-    listNotifikasi.first.id,
+    listNotifikasi.first.id ?? 0,
     listNotifikasi.first.judul,
     listNotifikasi.first.detail,
     const NotificationDetails(
@@ -142,7 +143,6 @@ Future<void> serviceStopped(
   Preferences.getTempAktivitas().then((tempAktivitas) {
     DateTime now = DateTime.now();
     DateTime startTime = DateTime.parse(tempAktivitas.tanggal);
-    print("SERVICE DIHENTIKAN $now");
     Duration alreadyRunning = now.difference(startTime);
 
     Aktivitas aktivitas = Aktivitas(

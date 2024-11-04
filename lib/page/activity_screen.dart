@@ -30,9 +30,15 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
 
   double avgJangkauanIni = 0;
 
+  late int countBulanIni;
+  late int countMingguIni;
+
   @override
   void initState() {
     super.initState();
+
+    countBulanIni = 0;
+    countMingguIni = 0;
 
     DateTime currentDate = DateTime.now();
 
@@ -88,13 +94,14 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
     Map<String, double> temp = {};
     dataChart.clear();
 
-    int countBulanIni = 0;
     double tempAvgBulanIni = 0;
 
-    int countMingguIni = 0;
     double tempAvgMingguIni = 0;
 
     double tempAvgJangkauanIni = 0;
+
+    countBulanIni = 0;
+    countMingguIni = 0;
 
     for (Aktivitas item in listAktivitas) {
       int tanggal = DateTime.parse(item.tanggal).day;
@@ -131,14 +138,20 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
     setState(() {
       if (countBulanIni > 0) {
         avgBulanIni = tempAvgBulanIni / countBulanIni;
+      } else {
+        avgBulanIni = 0;
       }
 
       if (countMingguIni > 0) {
         avgMingguIni = tempAvgMingguIni / countMingguIni;
+      } else {
+        avgMingguIni = 0;
       }
 
       if (listAktivitas.isNotEmpty) {
         avgJangkauanIni = tempAvgJangkauanIni / listAktivitas.length;
+      } else {
+        avgJangkauanIni = 0;
       }
     });
 
@@ -242,15 +255,16 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
                         Wrap(
                           children: [
                             AverageWidget(
-                              title: "Bulan ini",
+                              title: "Bulan ini \n($countBulanIni data)",
                               menit: avgBulanIni,
                             ),
                             AverageWidget(
-                              title: "Minggu ini",
+                              title: "Minggu ini \n($countMingguIni data)",
                               menit: avgMingguIni,
                             ),
                             AverageWidget(
-                              title: "Jangkauan ini",
+                              title:
+                                  "Jangkauan ini \n(${listAktivitas.length} data)",
                               menit: avgJangkauanIni,
                             ),
                           ],
@@ -443,7 +457,7 @@ class AverageWidget extends StatelessWidget {
             ),
             Text(
               title,
-              textAlign: TextAlign.end,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 12,

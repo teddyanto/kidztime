@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-import 'package:kidztime/model/notifikasi.dart';
 import 'package:kidztime/routes.dart';
 import 'package:kidztime/utils/colors.dart';
 import 'package:kidztime/utils/database.dart';
+import 'package:kidztime/utils/notification_service.dart';
 import 'package:kidztime/utils/preferences.dart';
 import 'package:kidztime/utils/widget_util.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:kidztime/utils/notification_service.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 Future main() async {

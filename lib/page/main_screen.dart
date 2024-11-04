@@ -125,10 +125,15 @@ class _MainMenuPageState extends State<MainMenuPage> {
           updateStatusAktifBatasPenggunaan(dbKidztime, false);
           updateStatusAktifJadwal(dbKidztime, false);
           refreshDaftarAktivitas(dbKidztime);
+          saveUsage();
 
           setState(() {
             _bataspenggunaan = null;
             _batasWaktuIsRunning = false;
+          });
+
+          Timer(const Duration(seconds: 3), () {
+            refreshDaftarAktivitas(dbKidztime);
           });
         } else {
           setState(() {
@@ -136,6 +141,25 @@ class _MainMenuPageState extends State<MainMenuPage> {
           });
         }
       });
+    });
+  }
+
+  void saveUsage() {
+    Preferences.getTempAktivitas().then((tempAktivitas) {
+      DateTime now = DateTime.now();
+      DateTime startTime = DateTime.parse(tempAktivitas.tanggal);
+      Duration alreadyRunning = now.difference(startTime);
+
+      Aktivitas aktivitas = Aktivitas(
+        judul: tempAktivitas.judul,
+        deskripsi: tempAktivitas.deskripsi,
+        waktu: alreadyRunning.inSeconds,
+        tanggal: tempAktivitas.tanggal,
+      );
+
+      FlutterBackgroundService().invoke("stopService");
+
+      insertAktivitas(dbKidztime, aktivitas);
     });
   }
 
@@ -550,6 +574,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
   void stopService() {
     updateStatusAktifBatasPenggunaan(dbKidztime, false);
     updateStatusAktifJadwal(dbKidztime, false);
+    saveUsage();
 
     setState(() {
       _bataspenggunaan = null;

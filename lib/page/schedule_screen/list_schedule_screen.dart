@@ -441,6 +441,13 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
   }
 
   Future<void> handleDeleteJadwal(int index, BuildContext context) async {
+    Jadwalpenggunaan tempRemove = resultSearch[index];
+
+// Remove the item from the list
+    setState(() {
+      resultSearch.removeAt(index);
+    });
+
     var result = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -449,6 +456,10 @@ class _ListScheduleScreenState extends State<ListScheduleScreen> {
         actions: [
           TextButton(
             onPressed: () {
+              setState(() {
+                resultSearch.insert(index, tempRemove);
+              });
+
               Navigator.pop(context, false);
             },
             child: const Text("Batal"),

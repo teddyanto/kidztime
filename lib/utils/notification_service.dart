@@ -51,7 +51,7 @@ class NotificationService {
       if (remainingTime == waktuInSeconds) {
         // Trigger the notification
         await flutterLocalNotificationsPlugin.show(
-          notifikasi.id,
+          notifikasi.id ?? 0,
           notifikasi.judul,
           notifikasi.detail,
           const NotificationDetails(
